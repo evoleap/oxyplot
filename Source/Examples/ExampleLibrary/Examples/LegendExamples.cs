@@ -107,6 +107,20 @@ namespace ExampleLibrary
             return model;
         }
 
+        [Example("Series legend text color")]
+        public static PlotModel SeriesLegendTextColor()
+        {
+            var model = new PlotModel { Title = "Series legend text color" };
+            model.LegendTextColor = OxyColors.Brown;
+            var colors = new List<OxyColor>() { OxyColors.Black, OxyColors.Gray, OxyColors.Red };
+            for (int i = 1; i <= colors.Count; i++)
+            {
+                model.Series.Add(new LineSeries { Title = "Series " + i, LegendTextColor = colors[i - 1] });
+            }
+            model.Series.Add(new LineSeries { Title = "Default (should be brown)" });
+            return model;
+        }
+
         private static PlotModel CreateModel(int n = 20)
         {
             var model = new PlotModel { Title = "LineSeries", LegendBackground = OxyColor.FromAColor(200, OxyColors.White), LegendBorder = OxyColors.Black };

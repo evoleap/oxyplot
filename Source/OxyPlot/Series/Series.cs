@@ -24,6 +24,7 @@ namespace OxyPlot.Series
         {
             this.IsVisible = true;
             this.Background = OxyColors.Undefined;
+            this.LegendTextColor = OxyColors.Automatic;
         }
 
         /// <summary>
@@ -31,6 +32,11 @@ namespace OxyPlot.Series
         /// </summary>
         /// <remarks>This property defines the background color in the area defined by the x and y axes used by this series.</remarks>
         public OxyColor Background { get; set; }
+
+        /// <summary>
+        /// Gets or sets the color of this series' text in the legend.
+        /// </summary>
+        public OxyColor LegendTextColor { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this series is visible.
