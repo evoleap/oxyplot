@@ -1,15 +1,28 @@
 #!/bin/sh
 
+NUGET=/usr/local/bin/NuGet.exe
+
+rm -f ../Output/*.nupkg
+
+cp ../README.md ../Output
+cp ../LICENSE ../Output
+cp ../AUTHORS ../Output
+cp ../CONTRIBUTORS ../Output
+cp ../README ../Output
+mkdir ../Output/lib
+mkdir ../Output/lib/MonoTouch
+mkdir ../Output/lib/MonoAndroid
+
+cp ../Output/XamarinIOS/OxyPlot.XamarinIOS.??? ../Output/lib/MonoTouch
+cp ../Output/XamarinAndroid/OxyPlot.XamarinAndroid.??? ../Output/lib/MonoAndroid
+
+cp ../Source/OxyPlot.XamarinIOS/*.nuspec ../Output
+cp ../Source/OxyPlot.XamarinAndroid/*.nuspec ../Output
+
 # Create XamarinIOS NuGet package
-mkdir ../Packages/OxyPlot.XamarinIOS/lib
-mkdir ../Packages/OxyPlot.XamarinIOS/lib/MonoTouch
-cp ../Output/XamarinIOS/OxyPlot.XamarinIOS.??? ../Packages/OxyPlot.XamarinIOS/lib/MonoTouch
-cp ../LICENSE ../Packages/OxyPlot.XamarinIOS
-mono ../Source/.nuget/NuGet.exe pack ../Packages/OxyPlot.XamarinIOS/OxyPlot.XamarinIOS.nuspec -OutputDirectory ../Output > pack.log
+mono $NUGET pack ../Output/OxyPlot.XamarinIOS.nuspec -OutputDirectory ../Output
 
 # Create XamarinAndroid NuGet package
-mkdir ../Packages/OxyPlot.XamarinAndroid/lib
-mkdir ../Packages/OxyPlot.XamarinAndroid/lib/MonoAndroid
-cp ../Output/XamarinAndroid/OxyPlot.XamarinAndroid.??? ../Packages/OxyPlot.XamarinAndroid/lib/MonoAndroid
-cp ../LICENSE ../Packages/OxyPlot.XamarinAndroid
-mono ../Source/.nuget/NuGet.exe pack ../Packages/OxyPlot.XamarinAndroid/OxyPlot.XamarinAndroid.nuspec -OutputDirectory ../Output >> pack.log
+mono $NUGET pack ../Output/OxyPlot.XamarinAndroid.nuspec -OutputDirectory ../Output
+
+ls -al ../Output/*.nupkg
