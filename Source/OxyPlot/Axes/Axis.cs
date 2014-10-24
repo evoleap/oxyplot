@@ -662,7 +662,7 @@ namespace OxyPlot.Axes
                 i++;
 
                 // try to get rid of numerical noise
-                var v = Math.Round(value / step, 14) * step;
+                var v = Math.Round(Math.Round(value / step, 14) * step, 14);
                 values.Add(v);
                 value += step;
             }
