@@ -646,25 +646,44 @@ namespace OxyPlot.Axes
                 throw new ArgumentException("Step cannot be zero or negative.", "step");
             }
 
+            // trivial case
+            if (from == to)
+            {
+                return new List<double>() { from };
+            }
+
+            // Check if we're going negative or positive
+            bool reversed = false;
             if (to <= from && step > 0)
             {
+                reversed = true;
                 step *= -1;
             }
 
-            var value = Math.Round(from / step) * step;
-            var numberOfValues = Math.Max((int)((to - from) / step), 1);
+            // Get a nice starting number
+            var start = Math.Round(from / step) * step;
             var epsilon = step * 1e-3 * Math.Sign(step);
+
+            // Remove numerical noise
+            var epsilonDecimals = (int)(-Math.Log10(epsilon)) + 1;
+            if (epsilonDecimals >= 1 && epsilonDecimals <= 15)
+            {
+                // # of decimals outside of the range [1,15] cannot be, and do not need to be, rounded
+                start = Math.Round(start, epsilonDecimals);
+            }
+
+            var numberOfValues = Math.Max((int)((to - from) / step), 1);
             var values = new List<double>(numberOfValues);
             var i = 0;
 
-            while (value <= to + epsilon && i < maxTicks)
+            var value = start;
+            while (i < maxTicks && (reversed ?
+                        (value >= to - epsilon) :
+                        (value <= to + epsilon)))
             {
+                values.Add(value);
                 i++;
-
-                // try to get rid of numerical noise
-                var v = Math.Round(Math.Round(value / step, 14) * step, 14);
-                values.Add(v);
-                value += step;
+                value = start + (i * step);
             }
 
             return values;
