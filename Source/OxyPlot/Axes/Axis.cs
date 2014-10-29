@@ -666,11 +666,18 @@ namespace OxyPlot.Axes
 
             // Remove numerical noise
             var epsilonDecimals = (int)(-Math.Log10(epsilon)) + 1;
-            if (epsilonDecimals >= 1 && epsilonDecimals <= 15)
+            Func<double, double> removeNoise = (d) =>
             {
-                // # of decimals outside of the range [1,15] cannot be, and do not need to be, rounded
-                start = Math.Round(start, epsilonDecimals);
-            }
+                if (epsilonDecimals >= 1 && epsilonDecimals <= 15)
+                {
+                    // # of decimals outside of the range [1,15] cannot be, and do not need to be, rounded
+                    d = Math.Round(d, epsilonDecimals);
+                }
+
+                return d;
+            };
+
+            start = removeNoise(start);
 
             var numberOfValues = Math.Max((int)((to - from) / step), 1);
             var values = new List<double>(numberOfValues);
@@ -683,7 +690,7 @@ namespace OxyPlot.Axes
             {
                 values.Add(value);
                 i++;
-                value = start + (i * step);
+                value = removeNoise(start + (i * step));
             }
 
             return values;
