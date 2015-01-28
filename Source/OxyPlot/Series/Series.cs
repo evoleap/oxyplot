@@ -66,6 +66,11 @@ namespace OxyPlot.Series
         public string TrackerKey { get; set; }
 
         /// <summary>
+        /// Gets the area used when drawing the legend text for this series.
+        /// </summary>
+        public OxyRect LegendTextArea { get; internal set; }
+
+        /// <summary>
         /// Gets the point on the series that is nearest the specified point.
         /// </summary>
         /// <param name="point">The point.</param>

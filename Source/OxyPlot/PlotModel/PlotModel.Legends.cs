@@ -214,6 +214,8 @@ namespace OxyPlot
                 VerticalAlignment.Top,
                 maxsize,
                 true);
+            s.LegendTextArea = new OxyRect(new ScreenPoint(x, y), textSize);
+
             double x0 = x;
             switch (this.LegendItemAlignment)
             {
@@ -361,6 +363,7 @@ namespace OxyPlot
                 // Skip series with empty title
                 if (string.IsNullOrEmpty(s.Title))
                 {
+                    s.LegendTextArea = new OxyRect();
                     continue;
                 }
 
