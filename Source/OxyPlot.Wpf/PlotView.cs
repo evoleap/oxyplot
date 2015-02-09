@@ -106,7 +106,7 @@ namespace OxyPlot.Wpf
         /// <summary>
         /// The render context
         /// </summary>
-        private ShapesRenderContext renderContext;
+        private IRenderContext renderContext;
 
         /// <summary>
         /// The zoom control.
@@ -419,7 +419,7 @@ namespace OxyPlot.Wpf
             this.canvas = new Canvas();
             this.grid.Children.Add(this.canvas);
             this.canvas.UpdateLayout();
-            this.renderContext = new ShapesRenderContext(this.canvas);
+            this.renderContext = CreateRenderContext(this.canvas) ?? new ShapesRenderContext(this.canvas);
 
             this.overlays = new Canvas();
             this.grid.Children.Add(this.overlays);
@@ -427,6 +427,11 @@ namespace OxyPlot.Wpf
             this.zoomControl = new ContentControl();
             this.overlays.Children.Add(this.zoomControl);
             this.CommandBindings.Add(new CommandBinding(PlotCommands.ResetAxes, (s, e) => this.ResetAllAxes()));
+        }
+
+        protected virtual IRenderContext CreateRenderContext(Canvas renderCanvas)
+        {
+            return new ShapesRenderContext(renderCanvas);
         }
 
         /// <summary>
