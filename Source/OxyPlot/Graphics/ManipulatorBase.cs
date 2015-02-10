@@ -20,8 +20,19 @@ namespace OxyPlot
         /// </summary>
         /// <param name="view">The view.</param>
         protected ManipulatorBase(IView view)
+            : this(view, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ManipulatorBase{T}" /> class.
+        /// </summary>
+        /// <param name="view">The view.</param>
+        /// <param name="updateCursor">Whether the cursor will automatically be set during manipulations.</param>
+        protected ManipulatorBase(IView view, bool updateCursor)
         {
             this.View = view;
+            this.UpdateCursor = updateCursor;
         }
 
         /// <summary>
@@ -31,12 +42,20 @@ namespace OxyPlot
         public IView View { get; private set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the view's cursor will automatically be set during manipulations.
+        /// </summary>
+        public bool UpdateCursor { get; set; }
+
+        /// <summary>
         /// Occurs when a manipulation is complete.
         /// </summary>
         /// <param name="e">The <see cref="OxyInputEventArgs" /> instance containing the event data.</param>
         public virtual void Completed(T e)
         {
-            this.View.SetCursorType(CursorType.Default);
+            if (this.UpdateCursor)
+            {
+                this.View.SetCursorType(CursorType.Default);
+            }
         }
 
         /// <summary>
@@ -62,7 +81,10 @@ namespace OxyPlot
         /// <param name="e">The <see cref="OxyInputEventArgs" /> instance containing the event data.</param>
         public virtual void Started(T e)
         {
-            this.View.SetCursorType(this.GetCursorType());
+            if (this.UpdateCursor)
+            {
+                this.View.SetCursorType(this.GetCursorType());
+            }
         }
     }
 }
