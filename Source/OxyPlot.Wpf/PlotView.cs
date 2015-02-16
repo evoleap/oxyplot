@@ -864,6 +864,21 @@ namespace OxyPlot.Wpf
             }
 
             this.InvalidatePlot();
+            this.Dispatcher.BeginInvoke(new Action(this.SendMouseToNewModel), DispatcherPriority.Loaded);
+        }
+
+        private void SendMouseToNewModel()
+        {
+            if (this.IsMouseOver)
+            {
+                this.ActualController.HandleMouseEnter(
+                    this,
+                    new OxyMouseEventArgs()
+                    {
+                        Position = Mouse.GetPosition(this).ToScreenPoint(),
+                        ModifierKeys = Keyboard.GetModifierKeys()
+                    });
+            }
         }
 
         /// <summary>
