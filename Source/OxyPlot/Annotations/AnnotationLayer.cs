@@ -27,6 +27,11 @@ namespace OxyPlot.Annotations
         /// <summary>
         /// Render the annotation above the series.
         /// </summary>
-        AboveSeries
+        AboveSeries,
+
+        /// <summary>
+        /// Render the annotation above everything else except other annotations at this level.
+        /// </summary>
+        Highest
     }
 }

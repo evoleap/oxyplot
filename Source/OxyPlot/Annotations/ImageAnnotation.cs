@@ -22,6 +22,11 @@ namespace OxyPlot.Annotations
         private OxyRect actualBounds;
 
         /// <summary>
+        /// The bounds defined by the X, Y, Width, and Height properties.
+        /// </summary>
+        private OxyRect fullBounds;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ImageAnnotation" /> class.
         /// </summary>
         public ImageAnnotation()
@@ -36,6 +41,7 @@ namespace OxyPlot.Annotations
             this.Interpolate = true;
             this.HorizontalAlignment = HorizontalAlignment.Center;
             this.VerticalAlignment = VerticalAlignment.Middle;
+            this.StretchToBoundingBox = true;
         }
 
         /// <summary>
@@ -173,6 +179,28 @@ namespace OxyPlot.Annotations
         public VerticalAlignment VerticalAlignment { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the image should be stretch to fit
+        /// into the bounding box defined by the Width and Height properties.
+        /// </summary>
+        public bool StretchToBoundingBox { get; set; }
+
+        /// <summary>
+        /// Gets the bounds of the rendered image's rectangle.
+        /// </summary>
+        protected OxyRect ImageBounds
+        {
+            get { return this.actualBounds; }
+        }
+
+        /// <summary>
+        /// Gets the bounds full bounds of the annotation (without stretch logic applied).
+        /// </summary>
+        protected OxyRect FullBounds
+        {
+            get { return this.fullBounds; }
+        }
+
+        /// <summary>
         /// Renders the image annotation.
         /// </summary>
         /// <param name="rc">The render context.</param>
@@ -232,6 +260,26 @@ namespace OxyPlot.Annotations
             if (this.VerticalAlignment == VerticalAlignment.Bottom)
             {
                 y -= height;
+            }
+
+            this.fullBounds = new OxyRect(x, y, width, height);
+
+            if (!this.StretchToBoundingBox)
+            {
+                double scaleX = width / this.ImageSource.Width;
+                double scaleY = height / this.ImageSource.Height;
+                double minScale = scaleX < scaleY ? scaleX : scaleY;
+
+                double newWidth = minScale * this.ImageSource.Width;
+                double newHeight = minScale * this.ImageSource.Height;
+
+                double widthDiff = width - newWidth;
+                double heightDiff = height - newHeight;
+
+                width = newWidth;
+                height = newHeight;
+                x += widthDiff / 2;
+                y += heightDiff / 2;
             }
 
             this.actualBounds = new OxyRect(x, y, width, height);

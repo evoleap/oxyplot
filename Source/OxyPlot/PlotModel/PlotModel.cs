@@ -1128,6 +1128,11 @@ namespace OxyPlot
             {
                 yield return axis;
             }
+
+            foreach (var annotation in this.Annotations.Where(a => a.Layer == AnnotationLayer.Highest))
+            {
+                yield return annotation;
+            }
         }
 
         /// <summary>

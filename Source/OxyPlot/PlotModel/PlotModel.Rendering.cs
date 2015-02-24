@@ -119,6 +119,8 @@ namespace OxyPlot
                     {
                         this.RenderLegends(rc, this.LegendArea);
                     }
+
+                    this.RenderAnnotations(rc, AnnotationLayer.Highest);
                 }
                 catch (Exception exception)
                 {
