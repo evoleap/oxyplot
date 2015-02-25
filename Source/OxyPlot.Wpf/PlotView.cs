@@ -663,7 +663,7 @@ namespace OxyPlot.Wpf
         /// <param name="e">The <see cref="T:System.Windows.Input.MouseEventArgs" /> that contains the event data.</param>
         protected override void OnMouseLeave(MouseEventArgs e)
         {
-            base.OnMouseEnter(e);
+            base.OnMouseLeave(e);
             if (e.Handled)
             {
                 return;
