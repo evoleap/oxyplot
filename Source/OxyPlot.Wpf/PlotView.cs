@@ -269,7 +269,7 @@ namespace OxyPlot.Wpf
         /// <summary>
         /// Hides the tracker.
         /// </summary>
-        public void HideTracker()
+        public virtual void HideTracker()
         {
             if (this.currentTracker == null)
             {
@@ -340,7 +340,7 @@ namespace OxyPlot.Wpf
         /// Shows the tracker.
         /// </summary>
         /// <param name="trackerHitResult">The tracker data.</param>
-        public void ShowTracker(TrackerHitResult trackerHitResult)
+        public virtual void ShowTracker(TrackerHitResult trackerHitResult)
         {
             if (trackerHitResult == null)
             {
@@ -1093,7 +1093,7 @@ namespace OxyPlot.Wpf
                         this.grid.Children.RemoveAt(idx);
                     }
 
-                    ((IPlotModel)this.ActualModel).Render(this.renderContext, this.canvas.ActualWidth, this.canvas.ActualHeight);
+                    this.RenderModel();
 
                     // reinsert the canvas again
                     if (idx != -1)
@@ -1103,9 +1103,18 @@ namespace OxyPlot.Wpf
                 }
                 else
                 {
-                    ((IPlotModel)this.ActualModel).Render(this.renderContext, this.canvas.ActualWidth, this.canvas.ActualHeight);
+                    this.RenderModel();
                 }
             }
         }
+
+        /// <summary>
+        /// Calls the <see cref="Render"/> method on the PlotModel.
+        /// </summary>
+        protected virtual void RenderModel()
+        {
+            ((IPlotModel)this.ActualModel).Render(this.renderContext, this.canvas.ActualWidth, this.canvas.ActualHeight);
+        }
+
     }
 }
