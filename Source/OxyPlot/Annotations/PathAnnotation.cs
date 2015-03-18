@@ -395,6 +395,7 @@ namespace OxyPlot.Annotations
                     return new HitTestResult(this, nearestPoint);
                 }
             }
+
             return null;
         }
 
