@@ -54,7 +54,7 @@ namespace OxyPlot
                                 "An exception of type {0} was thrown when updating the plot model.\r\n{1}",
                                 this.updateException.GetType(),
                                 this.updateException.GetBaseException().StackTrace);
-                        this.RenderErrorMessage(rc, string.Format("OxyPlot exception: {0}", this.updateException.Message), errorMessage);
+                        this.HandleRenderError(rc, this.updateException, errorMessage);
                         return;
                     }
 
@@ -129,7 +129,7 @@ namespace OxyPlot
                             "An exception of type {0} was thrown when rendering the plot model.\r\n{1}",
                             exception.GetType(),
                             exception.GetBaseException().StackTrace);
-                    this.RenderErrorMessage(rc, string.Format("OxyPlot exception: {0}", exception.Message), errorMessage);
+                    this.HandleRenderError(rc, exception, errorMessage);
                 }
                 finally
                 {
@@ -137,6 +137,18 @@ namespace OxyPlot
                     rc.CleanUp();
                 }
             }
+        }
+
+        /// <summary>
+        /// Handles error encountered during the Update or Render process.  This method is only called during the
+        /// Render process (Update errors are cached until Render).
+        /// </summary>
+        /// <param name="rc">The render context</param>
+        /// <param name="exception">The error that was encountered</param>
+        /// <param name="errorMessage">A system-generated error message</param>
+        protected virtual void HandleRenderError(IRenderContext rc, Exception exception, string errorMessage)
+        {
+            this.RenderErrorMessage(rc, string.Format("OxyPlot exception: {0}", exception.Message), errorMessage);
         }
 
         /// <summary>
