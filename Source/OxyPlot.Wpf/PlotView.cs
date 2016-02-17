@@ -537,6 +537,11 @@ namespace OxyPlot.Wpf
                     this.UpdateVisuals();
                 }
             }
+            else
+            {
+                // Don't get stuck in an invalidated state
+                Interlocked.Exchange(ref this.isPlotInvalidated, 0);
+            }
 
             return base.ArrangeOverride(arrangeBounds);
         }
