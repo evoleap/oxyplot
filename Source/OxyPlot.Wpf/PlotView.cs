@@ -413,7 +413,7 @@ namespace OxyPlot.Wpf
             this.canvas = new Canvas();
             this.grid.Children.Add(this.canvas);
             this.canvas.UpdateLayout();
-            this.renderContext = CreateRenderContext(this.canvas) ?? new ShapesRenderContext(this.canvas);
+            this.renderContext = this.CreateRenderContext(this.canvas) ?? new ShapesRenderContext(this.canvas);
 
             this.overlays = new Canvas();
             this.grid.Children.Add(this.overlays);
@@ -421,11 +421,6 @@ namespace OxyPlot.Wpf
             this.zoomControl = new ContentControl();
             this.overlays.Children.Add(this.zoomControl);
             this.CommandBindings.Add(new CommandBinding(PlotCommands.ResetAxes, (s, e) => this.ResetAllAxes()));
-        }
-
-        protected virtual IRenderContext CreateRenderContext(Canvas renderCanvas)
-        {
-            return new ShapesRenderContext(renderCanvas);
         }
 
         /// <summary>
@@ -521,6 +516,16 @@ namespace OxyPlot.Wpf
         public string ToXaml()
         {
             return XamlExporter.ExportToString(this.ActualModel, this.ActualWidth, this.ActualHeight, this.Background.ToOxyColor());
+        }
+
+        /// <summary>
+        /// Creates the render context used by the <see cref="PlotView"/>.
+        /// </summary>
+        /// <param name="renderCanvas">The canvas to which the render context should render</param>
+        /// <returns>An <see cref="IRenderContext"/> instance used to render into the <see cref="PlotView"/>.</returns>
+        protected virtual IRenderContext CreateRenderContext(Canvas renderCanvas)
+        {
+            return new ShapesRenderContext(renderCanvas);
         }
 
         /// <summary>
@@ -747,6 +752,14 @@ namespace OxyPlot.Wpf
         }
 
         /// <summary>
+        /// Calls the <see cref="Render"/> method on the PlotModel.
+        /// </summary>
+        protected virtual void RenderModel()
+        {
+            ((IPlotModel)this.ActualModel).Render(this.renderContext, this.canvas.ActualWidth, this.canvas.ActualHeight);
+        }
+
+        /// <summary>
         /// Called when the visual appearance is changed.
         /// </summary>
         /// <param name="d">The d.</param>
@@ -866,6 +879,9 @@ namespace OxyPlot.Wpf
             this.Dispatcher.BeginInvoke(new Action(this.SendMouseToNewModel), DispatcherPriority.Loaded);
         }
 
+        /// <summary>
+        /// Called when the model changes while the mouse is over the plot.  This methods sends a MouseEnter event to the new model.
+        /// </summary>
         private void SendMouseToNewModel()
         {
             if (this.IsMouseOver)
@@ -1112,14 +1128,5 @@ namespace OxyPlot.Wpf
                 }
             }
         }
-
-        /// <summary>
-        /// Calls the <see cref="Render"/> method on the PlotModel.
-        /// </summary>
-        protected virtual void RenderModel()
-        {
-            ((IPlotModel)this.ActualModel).Render(this.renderContext, this.canvas.ActualWidth, this.canvas.ActualHeight);
-        }
-
     }
 }
