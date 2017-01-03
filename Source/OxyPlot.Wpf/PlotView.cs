@@ -752,7 +752,7 @@ namespace OxyPlot.Wpf
         }
 
         /// <summary>
-        /// Calls the <see cref="Render"/> method on the PlotModel.
+        /// Calls the <see cref="IPlotModel.Render"/> method on the PlotModel.
         /// </summary>
         protected virtual void RenderModel()
         {
