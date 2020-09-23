@@ -362,117 +362,127 @@ namespace OxyPlot.Axes
             DateTime? startingTick = null;
             var range = TimeSpanAxis.ToTimeSpan(dRange);
             double interval = 1.0;
-            switch (range)
+            if (range.TotalDays > 365)
             {
-                case var t when t.TotalDays > 365:
-                    // Pick the closest 1st of a nice month
-                    for (int i = 0; i < _niceMonthNumbers.Length; i++)
-                        if (startTime.TimeToNextOccurrenceOfMonth(_niceMonthNumbers[i]) < TimeSpan.FromSeconds(t.TotalSeconds * factor))
-                        {
-                            startingTick = new DateTime(startTime.Year + (startTime.Month > _niceMonthNumbers[i] ? 1 : 0), _niceMonthNumbers[i], 1, 0, 0, 0, DateTimeKind.Local);
-                            break;
-                        }
-                    if (!startingTick.HasValue)
-                        startingTick = startTime.FirstOfFollowingYear();
-                    int numMonthsToAdd = (int)((range.TotalDays / AVERAGE_DAYS_PER_YEAR) * 4 + 0.5) * 3;
-                    // Interval
-                    interval = TimeSpanAxis.ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
-                    break;
-                case var t when t.TotalDays > 28:
-                    // Pick the closest 1st of a month
-                    startingTick = startTime.FirstOfFollowingMonth();
-                    //  var bHalfMonth = false;
-                    int monthIntTimesTwo = ((int)(t.TotalDays / AVERAGE_DAYS_PER_MONTH * 2.0)) + 1;
-                    //if (monthIntTimesTwo % 2 == 1)
-                    //    bHalfMonth = true;
-                    double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGE_DAYS_PER_MONTH;
-                    // Interval
-                    interval = TimeSpanAxis.ToDouble(TimeSpan.FromDays(daysToAdd));
-                    break;
-                case var t when t.TotalDays > 1:
-                    var nextNiceDay = startTime.NextNiceDay(_niceDayNumbers);
-                    var timeToNextNiceDay = nextNiceDay - startTime;
-                    if (timeToNextNiceDay.TotalDays < t.TotalDays * factor)
+
+                // Pick the closest 1st of a nice month
+                for (int i = 0; i < _niceMonthNumbers.Length; i++)
+                    if (startTime.TimeToNextOccurrenceOfMonth(_niceMonthNumbers[i]) < TimeSpan.FromSeconds(range.TotalSeconds * factor))
                     {
-                        startingTick = nextNiceDay;
+                        startingTick = new DateTime(startTime.Year + (startTime.Month > _niceMonthNumbers[i] ? 1 : 0), _niceMonthNumbers[i], 1, 0, 0, 0, DateTimeKind.Local);
+                        break;
                     }
-                    else
-                        startingTick = startTime.NextDay();
-                    // Interval
-                    interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                        (int)t.TotalDays, (int)t.TotalDays + 1, numLabels, 86400));
-                    break;
-                case var t when t.TotalMinutes > 50:
-                    // return next nice hour
-                    var closestNiceHour = 0;
-                    for (int i = 1; i < _niceHourNumbers.Length; i++)
-                        if (startTime.Hour < _niceHourNumbers[i])
-                        {
-                            closestNiceHour = _niceHourNumbers[i];
-                            break;
-                        }
-                    DateTime closestNiceTime;
-                    if (closestNiceHour == 0)
-                        closestNiceTime = startTime.NextDay();
-                    else
-                        closestNiceTime = startTime.Date + TimeSpan.FromHours(closestNiceHour);
-                    if ((closestNiceTime - startTime).TotalHours < t.TotalHours * factor)
-                        startingTick = closestNiceTime;
-                    else
-                        startingTick = startTime.Date + TimeSpan.FromHours(startTime.Hour + 1);
-                    // Interval
-                    int minutesToAdd = ((int)((t.TotalMinutes / 30.0) + 0.9)) * 30;
-                    for (int i = 0; i < _niceHourIntervals.Length; i++)
-                        if (minutesToAdd / 60.0 <= _niceHourIntervals[i])
-                        {
-                            minutesToAdd = (int)(_niceHourIntervals[i] * 60);
-                            break;
-                        }
-                    interval = TimeSpanAxis.ToDouble(TimeSpan.FromMinutes(minutesToAdd));
-                    break;
-                case var t when t.TotalSeconds > 50:
-                    TimeSpan diff = startTime.GetToClosestNiceInterval(t, _niceMinuteNumbers, (st) => st.Minute, 60.0, factor);
-                    startingTick = startTime + diff - TimeSpan.FromSeconds(startTime.Second + startTime.Millisecond / 1000);
-                    // Interval
-                    int secondsToAdd = ((int)((t.TotalSeconds / 30.0) + 1)) * 30;
-                    for (int i = 0; i < _niceMinuteIntervals.Length; i++)
-                        if (secondsToAdd / 60 <= _niceMinuteIntervals[i])
-                        {
-                            secondsToAdd = (int)(_niceMinuteIntervals[i] * 60);
-                            break;
-                        }
-                    interval = TimeSpanAxis.ToDouble(TimeSpan.FromSeconds(secondsToAdd));
-                    break;
-                case var t when t.TotalSeconds > 1:
-                    TimeSpan diffSec = startTime.GetToClosestNiceInterval(t, _niceSecondNumbers, (st) => st.Second, 1.0, factor);
-                    startingTick = startTime + diffSec;
-                    // Interval
-                    for (int i = 1; i < _niceSecondIntervals.Length; i++)
-                    {
-                        if (t.TotalSeconds < _niceSecondIntervals[i])
-                        {
-                            interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                                _niceSecondIntervals[i-1], _niceSecondIntervals[i], numLabels, 1));
-                            break;
-                        }
-                    }
-                    break;
-                default:
-                    TimeSpan diffMicrosec = startTime.GetToClosestNiceInterval(range, _niceMillisecondIntervals, (st) => st.Millisecond, 0.001, factor);
-                    startingTick = startTime + diffMicrosec;
-                    // Interval
-                    for (int i = 1; i < _niceMillisecondIntervals.Length; i++)
-                    {
-                        if (range.TotalMilliseconds < _niceMillisecondIntervals[i])
-                        {
-                            interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                                _niceMillisecondIntervals[i - 1], _niceMillisecondIntervals[i], numLabels, 0.001));
-                            break;
-                        }
-                    }
-                    break;
+                if (!startingTick.HasValue)
+                    startingTick = startTime.FirstOfFollowingYear();
+                int numMonthsToAdd = (int)((range.TotalDays / AVERAGE_DAYS_PER_YEAR) * 4 + 0.5) * 3;
+                // Interval
+                interval = TimeSpanAxis.ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
             }
-            
+            else if (range.TotalDays > 28)
+            {
+
+                // Pick the closest 1st of a month
+                startingTick = startTime.FirstOfFollowingMonth();
+                //  var bHalfMonth = false;
+                int monthIntTimesTwo = ((int)(range.TotalDays / AVERAGE_DAYS_PER_MONTH * 2.0)) + 1;
+                //if (monthIntTimesTwo % 2 == 1)
+                //    bHalfMonth = true;
+                double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGE_DAYS_PER_MONTH;
+                // Interval
+                interval = TimeSpanAxis.ToDouble(TimeSpan.FromDays(daysToAdd));
+            }
+            else if (range.TotalDays > 1)
+            {
+
+                var nextNiceDay = startTime.NextNiceDay(_niceDayNumbers);
+                var timeToNextNiceDay = nextNiceDay - startTime;
+                if (timeToNextNiceDay.TotalDays < range.TotalDays * factor)
+                {
+                    startingTick = nextNiceDay;
+                }
+                else
+                    startingTick = startTime.NextDay();
+                // Interval
+                interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                    (int)range.TotalDays, (int)range.TotalDays + 1, numLabels, 86400));
+            }
+            else if (range.TotalMinutes > 50)
+            {
+
+                // return next nice hour
+                var closestNiceHour = 0;
+                for (int i = 1; i < _niceHourNumbers.Length; i++)
+                    if (startTime.Hour < _niceHourNumbers[i])
+                    {
+                        closestNiceHour = _niceHourNumbers[i];
+                        break;
+                    }
+                DateTime closestNiceTime;
+                if (closestNiceHour == 0)
+                    closestNiceTime = startTime.NextDay();
+                else
+                    closestNiceTime = startTime.Date + TimeSpan.FromHours(closestNiceHour);
+                if ((closestNiceTime - startTime).TotalHours < range.TotalHours * factor)
+                    startingTick = closestNiceTime;
+                else
+                    startingTick = startTime.Date + TimeSpan.FromHours(startTime.Hour + 1);
+                // Interval
+                int minutesToAdd = ((int)((range.TotalMinutes / 30.0) + 0.9)) * 30;
+                for (int i = 0; i < _niceHourIntervals.Length; i++)
+                    if (minutesToAdd / 60.0 <= _niceHourIntervals[i])
+                    {
+                        minutesToAdd = (int)(_niceHourIntervals[i] * 60);
+                        break;
+                    }
+                interval = TimeSpanAxis.ToDouble(TimeSpan.FromMinutes(minutesToAdd));
+            }
+            else if (range.TotalSeconds > 50)
+            {
+
+                TimeSpan diff = startTime.GetToClosestNiceInterval(range, _niceMinuteNumbers, (st) => st.Minute, 60.0, factor);
+                startingTick = startTime + diff - TimeSpan.FromSeconds(startTime.Second + startTime.Millisecond / 1000);
+                // Interval
+                int secondsToAdd = ((int)((range.TotalSeconds / 30.0) + 1)) * 30;
+                for (int i = 0; i < _niceMinuteIntervals.Length; i++)
+                    if (secondsToAdd / 60 <= _niceMinuteIntervals[i])
+                    {
+                        secondsToAdd = (int)(_niceMinuteIntervals[i] * 60);
+                        break;
+                    }
+                interval = TimeSpanAxis.ToDouble(TimeSpan.FromSeconds(secondsToAdd));
+            }
+            else if (range.TotalSeconds > 1)
+            {
+
+                TimeSpan diffSec = startTime.GetToClosestNiceInterval(range, _niceSecondNumbers, (st) => st.Second, 1.0, factor);
+                startingTick = startTime + diffSec;
+                // Interval
+                for (int i = 1; i < _niceSecondIntervals.Length; i++)
+                {
+                    if (range.TotalSeconds < _niceSecondIntervals[i])
+                    {
+                        interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                            _niceSecondIntervals[i - 1], _niceSecondIntervals[i], numLabels, 1));
+                        break;
+                    }
+                }
+            }
+            else
+            {
+
+                TimeSpan diffMicrosec = startTime.GetToClosestNiceInterval(range, _niceMillisecondIntervals, (st) => st.Millisecond, 0.001, factor);
+                startingTick = startTime + diffMicrosec;
+                // Interval
+                for (int i = 1; i < _niceMillisecondIntervals.Length; i++)
+                {
+                    if (range.TotalMilliseconds < _niceMillisecondIntervals[i])
+                    {
+                        interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                            _niceMillisecondIntervals[i - 1], _niceMillisecondIntervals[i], numLabels, 0.001));
+                        break;
+                    }
+                }
+            }
 
             
             this.actualIntervalType = this.IntervalType;
@@ -548,7 +558,7 @@ namespace OxyPlot.Axes
         {
             var values = new Collection<double>();
             double factor = 1.0;
-            int numLabels = (int)((max-min) / step);
+            int numLabels = (int)((max - min) / step);
             double dRange = Math.Abs(max - min);
             var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
             var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
@@ -556,161 +566,170 @@ namespace OxyPlot.Axes
             var range = TimeSpanAxis.ToTimeSpan(step);
             double interval = 1.0;
             DateTime nextTick;
-            switch (range)
+            if (range.TotalDays > 365)
             {
-                case var t when t.TotalDays > 365:
-                    // Pick the closest 1st of a nice month
-                    for (int i = 0; i < _niceMonthNumbers.Length; i++)
-                        if (startTime.TimeToNextOccurrenceOfMonth(_niceMonthNumbers[i]) < TimeSpan.FromSeconds(t.TotalSeconds * factor))
-                        {
-                            startingTick = new DateTime(startTime.Year + (startTime.Month > _niceMonthNumbers[i] ? 1 : 0), _niceMonthNumbers[i], 1, 0, 0, 0, DateTimeKind.Local);
-                            break;
-                        }
-                    if (!startingTick.HasValue)
-                        startingTick = startTime.FirstOfFollowingYear();
-                    nextTick = startingTick.Value;
-                    values.Add(ToDouble(nextTick));
-                    // Interval
-                    int numMonthsToAdd = (int)((range.TotalDays / AVERAGE_DAYS_PER_YEAR) * 4 + 0.5) * 3;
-                    while ((nextTick = nextTick.AddMonths(numMonthsToAdd)) < endTime)
-                        values.Add(ToDouble(nextTick));
-                    interval = TimeSpanAxis.ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
-                    break;
-                case var t when t.TotalDays > 28:
-                    // Pick the closest 1st of a month
-                    startingTick = startTime.FirstOfFollowingMonth();
-                    nextTick = startingTick.Value;
-                    values.Add(ToDouble(nextTick));
-
-                    var bHalfMonth = false;
-                    int monthIntTimesTwo = ((int)(t.TotalDays / AVERAGE_DAYS_PER_MONTH * 2.0)) + 1;
-                    if (monthIntTimesTwo % 2 == 1)
-                        bHalfMonth = true;
-                    double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGE_DAYS_PER_MONTH;
-                    var tsDays = TimeSpan.FromDays(daysToAdd);
-                    while (true)
+                // Pick the closest 1st of a nice month
+                for (int i = 0; i < _niceMonthNumbers.Length; i++)
+                    if (startTime.TimeToNextOccurrenceOfMonth(_niceMonthNumbers[i]) < TimeSpan.FromSeconds(range.TotalSeconds * factor))
                     {
-                        nextTick = nextTick + tsDays;
-                        if (nextTick.Day < 5 || nextTick.Day > 25 || !bHalfMonth)
+                        startingTick = new DateTime(startTime.Year + (startTime.Month > _niceMonthNumbers[i] ? 1 : 0), _niceMonthNumbers[i], 1, 0, 0, 0, DateTimeKind.Local);
+                        break;
+                    }
+                if (!startingTick.HasValue)
+                    startingTick = startTime.FirstOfFollowingYear();
+                nextTick = startingTick.Value;
+                values.Add(ToDouble(nextTick));
+                // Interval
+                int numMonthsToAdd = (int)((range.TotalDays / AVERAGE_DAYS_PER_YEAR) * 4 + 0.5) * 3;
+                while ((nextTick = nextTick.AddMonths(numMonthsToAdd)) < endTime)
+                    values.Add(ToDouble(nextTick));
+                interval = TimeSpanAxis.ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
+            }
+            else if (range.TotalDays > 28)
+            {
+
+                // Pick the closest 1st of a month
+                startingTick = startTime.FirstOfFollowingMonth();
+                nextTick = startingTick.Value;
+                values.Add(ToDouble(nextTick));
+
+                var bHalfMonth = false;
+                int monthIntTimesTwo = ((int)(range.TotalDays / AVERAGE_DAYS_PER_MONTH * 2.0)) + 1;
+                if (monthIntTimesTwo % 2 == 1)
+                    bHalfMonth = true;
+                double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGE_DAYS_PER_MONTH;
+                var tsDays = TimeSpan.FromDays(daysToAdd);
+                while (true)
+                {
+                    nextTick = nextTick + tsDays;
+                    if (nextTick.Day < 5 || nextTick.Day > 25 || !bHalfMonth)
+                    {
+                        if (nextTick.Day > 25)
                         {
-                            if (nextTick.Day > 25)
-                            {
-                                nextTick = nextTick.FirstOfFollowingMonth();
-                            }
-                            else
-                                nextTick = new DateTime(nextTick.Year, nextTick.Month, 1, 0, 0, 0, startTime.Kind);
+                            nextTick = nextTick.FirstOfFollowingMonth();
                         }
                         else
-                            nextTick = new DateTime(nextTick.Year, nextTick.Month, 15, 0, 0, 0, startTime.Kind);
-                        if (nextTick < endTime)
-                            values.Add(ToDouble(nextTick));
-                        else
-                            break;
-                    }
-                    break;
-                case var t when t.TotalDays > 1:
-                    var nextNiceDay = startTime.NextNiceDay(_niceDayNumbers);
-                    var timeToNextNiceDay = nextNiceDay - startTime;
-                    if (timeToNextNiceDay.TotalDays < t.TotalDays * factor)
-                    {
-                        startingTick = nextNiceDay;
+                            nextTick = new DateTime(nextTick.Year, nextTick.Month, 1, 0, 0, 0, startTime.Kind);
                     }
                     else
-                        startingTick = startTime.NextDay();
-                    nextTick = startingTick.Value;
-                    values.Add(ToDouble(nextTick));
+                        nextTick = new DateTime(nextTick.Year, nextTick.Month, 15, 0, 0, 0, startTime.Kind);
+                    if (nextTick < endTime)
+                        values.Add(ToDouble(nextTick));
+                    else
+                        break;
+                }
+            }
+            else if (range.TotalDays > 1)
+            {
 
-                    // Interval
-                    var tsInterval = DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                        (int)t.TotalDays, (int)t.TotalDays + 1, numLabels, 86400);
-                    while ((nextTick = nextTick + tsInterval) < endTime)
-                        values.Add(ToDouble(nextTick));
-                    break;
-                case var t when t.TotalMinutes > 50:
-                    // return next nice hour
-                    var closestNiceHour = 0;
-                    for (int i = 1; i < _niceHourNumbers.Length; i++)
-                        if (startTime.Hour < _niceHourNumbers[i])
-                        {
-                            closestNiceHour = _niceHourNumbers[i];
-                            break;
-                        }
-                    DateTime closestNiceTime;
-                    if (closestNiceHour == 0)
-                        closestNiceTime = startTime.NextDay();
-                    else
-                        closestNiceTime = startTime.Date + TimeSpan.FromHours(closestNiceHour);
-                    if ((closestNiceTime - startTime).TotalHours < t.TotalHours * factor)
-                        startingTick = closestNiceTime;
-                    else
-                        startingTick = startTime.Date + TimeSpan.FromHours(startTime.Hour + 1);
-                    // Interval
-                    int minutesToAdd = ((int)((t.TotalMinutes / 30.0) + 0.9)) * 30;
-                    for (int i = 0; i < _niceHourIntervals.Length; i++)
-                        if (minutesToAdd / 60.0 <= _niceHourIntervals[i])
-                        {
-                            minutesToAdd = (int)(_niceHourIntervals[i] * 60);
-                            break;
-                        }
-                    nextTick = startingTick.Value;
+                var nextNiceDay = startTime.NextNiceDay(_niceDayNumbers);
+                var timeToNextNiceDay = nextNiceDay - startTime;
+                if (timeToNextNiceDay.TotalDays < range.TotalDays * factor)
+                {
+                    startingTick = nextNiceDay;
+                }
+                else
+                    startingTick = startTime.NextDay();
+                nextTick = startingTick.Value;
+                values.Add(ToDouble(nextTick));
+
+                // Interval
+                var tsInterval = DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                    (int)range.TotalDays, (int)range.TotalDays + 1, numLabels, 86400);
+                while ((nextTick = nextTick + tsInterval) < endTime)
                     values.Add(ToDouble(nextTick));
-                    while ((nextTick = nextTick + TimeSpan.FromMinutes(minutesToAdd)) < endTime)
-                        values.Add(ToDouble(nextTick));
-                    break;
-                case var t when t.TotalSeconds > 50:
-                    TimeSpan diff = startTime.GetToClosestNiceInterval(t, _niceMinuteNumbers, (st) => st.Minute, 60.0, factor);
-                    startingTick = startTime + diff - TimeSpan.FromSeconds(startTime.Second + startTime.Millisecond / 1000);
-                    // Interval
-                    int secondsToAdd = ((int)((t.TotalSeconds / 30.0) + 1)) * 30;
-                    for (int i = 0; i < _niceMinuteIntervals.Length; i++)
-                        if (secondsToAdd / 60 <= _niceMinuteIntervals[i])
-                        {
-                            secondsToAdd = (int)(_niceMinuteIntervals[i] * 60);
-                            break;
-                        }
-                    nextTick = startingTick.Value;
-                    values.Add(ToDouble(nextTick));
-                    while ((nextTick = nextTick + TimeSpan.FromSeconds(secondsToAdd)) < endTime)
-                        values.Add(ToDouble(nextTick));
-                    break;
-                case var t when t.TotalSeconds > 1:
-                    TimeSpan diffSec = startTime.GetToClosestNiceInterval(t, _niceSecondNumbers, (st) => st.Second, 1.0, factor);
-                    startingTick = startTime + diffSec;
-                    // Interval
-                    for (int i = 1; i < _niceSecondIntervals.Length; i++)
+            }
+            else if (range.TotalMinutes > 50)
+            {
+
+                // return next nice hour
+                var closestNiceHour = 0;
+                for (int i = 1; i < _niceHourNumbers.Length; i++)
+                    if (startTime.Hour < _niceHourNumbers[i])
                     {
-                        if (t.TotalSeconds < _niceSecondIntervals[i])
-                        {
-                            interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                                _niceSecondIntervals[i - 1], _niceSecondIntervals[i], numLabels, 1));
-                            break;
-                        }
+                        closestNiceHour = _niceHourNumbers[i];
+                        break;
                     }
-                    nextTick = startingTick.Value;
-                    values.Add(ToDouble(nextTick));
-                    var tsSec = TimeSpanAxis.ToTimeSpan(interval);
-                    while ((nextTick = nextTick + tsSec) < endTime)
-                        values.Add(ToDouble(nextTick));
-                    break;
-                default:
-                    TimeSpan diffMicrosec = startTime.GetToClosestNiceInterval(range, _niceMillisecondIntervals, (st) => st.Millisecond, 0.001, factor);
-                    startingTick = startTime + diffMicrosec;
-                    // Interval
-                    for (int i = 1; i < _niceMillisecondIntervals.Length; i++)
+                DateTime closestNiceTime;
+                if (closestNiceHour == 0)
+                    closestNiceTime = startTime.NextDay();
+                else
+                    closestNiceTime = startTime.Date + TimeSpan.FromHours(closestNiceHour);
+                if ((closestNiceTime - startTime).TotalHours < range.TotalHours * factor)
+                    startingTick = closestNiceTime;
+                else
+                    startingTick = startTime.Date + TimeSpan.FromHours(startTime.Hour + 1);
+                // Interval
+                int minutesToAdd = ((int)((range.TotalMinutes / 30.0) + 0.9)) * 30;
+                for (int i = 0; i < _niceHourIntervals.Length; i++)
+                    if (minutesToAdd / 60.0 <= _niceHourIntervals[i])
                     {
-                        if (range.TotalMilliseconds < _niceMillisecondIntervals[i])
-                        {
-                            interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                                _niceMillisecondIntervals[i - 1], _niceMillisecondIntervals[i], numLabels, 0.001));
-                            break;
-                        }
+                        minutesToAdd = (int)(_niceHourIntervals[i] * 60);
+                        break;
                     }
-                    nextTick = startingTick.Value;
+                nextTick = startingTick.Value;
+                values.Add(ToDouble(nextTick));
+                while ((nextTick = nextTick + TimeSpan.FromMinutes(minutesToAdd)) < endTime)
                     values.Add(ToDouble(nextTick));
-                    var diffMilSec = TimeSpanAxis.ToTimeSpan(interval);
-                    while ((nextTick = nextTick + diffMilSec) < endTime)
-                        values.Add(ToDouble(nextTick));
-                    break;
+            }
+            else if (range.TotalSeconds > 50)
+            {
+
+                TimeSpan diff = startTime.GetToClosestNiceInterval(range, _niceMinuteNumbers, (st) => st.Minute, 60.0, factor);
+                startingTick = startTime + diff - TimeSpan.FromSeconds(startTime.Second + startTime.Millisecond / 1000);
+                // Interval
+                int secondsToAdd = ((int)((range.TotalSeconds / 30.0) + 1)) * 30;
+                for (int i = 0; i < _niceMinuteIntervals.Length; i++)
+                    if (secondsToAdd / 60 <= _niceMinuteIntervals[i])
+                    {
+                        secondsToAdd = (int)(_niceMinuteIntervals[i] * 60);
+                        break;
+                    }
+                nextTick = startingTick.Value;
+                values.Add(ToDouble(nextTick));
+                while ((nextTick = nextTick + TimeSpan.FromSeconds(secondsToAdd)) < endTime)
+                    values.Add(ToDouble(nextTick));
+            }
+            else if (range.TotalSeconds > 1)
+            {
+
+                TimeSpan diffSec = startTime.GetToClosestNiceInterval(range, _niceSecondNumbers, (st) => st.Second, 1.0, factor);
+                startingTick = startTime + diffSec;
+                // Interval
+                for (int i = 1; i < _niceSecondIntervals.Length; i++)
+                {
+                    if (range.TotalSeconds < _niceSecondIntervals[i])
+                    {
+                        interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                            _niceSecondIntervals[i - 1], _niceSecondIntervals[i], numLabels, 1));
+                        break;
+                    }
+                }
+                nextTick = startingTick.Value;
+                values.Add(ToDouble(nextTick));
+                var tsSec = TimeSpanAxis.ToTimeSpan(interval);
+                while ((nextTick = nextTick + tsSec) < endTime)
+                    values.Add(ToDouble(nextTick));
+            }
+            else
+            {
+                TimeSpan diffMicrosec = startTime.GetToClosestNiceInterval(range, _niceMillisecondIntervals, (st) => st.Millisecond, 0.001, factor);
+                startingTick = startTime + diffMicrosec;
+                // Interval
+                for (int i = 1; i < _niceMillisecondIntervals.Length; i++)
+                {
+                    if (range.TotalMilliseconds < _niceMillisecondIntervals[i])
+                    {
+                        interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                            _niceMillisecondIntervals[i - 1], _niceMillisecondIntervals[i], numLabels, 0.001));
+                        break;
+                    }
+                }
+                nextTick = startingTick.Value;
+                values.Add(ToDouble(nextTick));
+                var diffMilSec = TimeSpanAxis.ToTimeSpan(interval);
+                while ((nextTick = nextTick + diffMilSec) < endTime)
+                    values.Add(ToDouble(nextTick));
             }
 
             return values;
