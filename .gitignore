@@ -190,3 +190,4 @@ FakesAssemblies/
 
 # GhostDoc settings
 *.GhostDoc.xml
+*/.vs
