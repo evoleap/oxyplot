@@ -43,6 +43,19 @@ namespace OxyPlot.Axes
         /// </summary>
         private static readonly double MinDayValue = (DateTime.MinValue - TimeOrigin).TotalDays;
 
+        private static int[] _niceMillisecondIntervals = new[] { 1, 5, 10, 50, 100, 250, 500, 1000 };
+        private static int[] _niceSecondIntervals = new[] { 1, 2, 5, 10, 15, 30, 60 };
+        private static int[] _niceSecondNumbers = new[] { 5, 10, 15, 30, 45, 60 };
+        private static int[] _niceMinuteIntervals = new[] { 1, 2, 3, 5, 10, 15, 20, 30, 45, 60 };
+        private static int[] _niceMinuteNumbers = new[] { 5, 10, 15, 30, 45, 60 };
+        private static double[] _niceHourIntervals = new[] { 1, 1.5, 2, 3, 4, 6, 8, 12 };
+        private static int[] _niceHourNumbers = new[] { 0, 3, 6, 9, 12, 15, 18, 21 };
+        private static int[] _niceDayNumbers = new[] { 1, 15 };
+        private static int[] _niceMonthIntervals = new[] { 1, 3, 6, 12, 18, 24 };
+        private static int[] _niceMonthNumbers = new[] { 1, 7, 4, 10 };
+        private const double AVERAGE_DAYS_PER_MONTH = 30.4377;
+        private const double AVERAGE_DAYS_PER_YEAR = 365.2524;
+
         /// <summary>
         /// The actual interval type.
         /// </summary>
@@ -194,7 +207,24 @@ namespace OxyPlot.Axes
             var span = value - TimeOrigin;
             return span.TotalDays + 1;
         }
-
+        /// <summary>
+        /// Converts a DateTime to days after the time origin.
+        /// </summary>
+        /// <param name="span">The time span structure.</param>
+        /// <returns>The number of days in the time span</returns>
+        public static double ToDouble(TimeSpan span)
+        {
+            return span.TotalDays;
+        }
+        /// <summary>
+        /// Converts a a double (number of days) to a TimeSpan
+        /// </summary>
+        /// <param name="totalDays">A range in double as interpreted by this axis</param>
+        /// <returns>A TimeSpan structure</returns>
+        public static TimeSpan ToTimeSpan(double totalDays)
+        {
+            return TimeSpan.FromDays(totalDays);
+        }
         /// <summary>
         /// Gets the tick values.
         /// </summary>
@@ -204,10 +234,18 @@ namespace OxyPlot.Axes
         public override void GetTickValues(
             out IList<double> majorLabelValues, out IList<double> majorTickValues, out IList<double> minorTickValues)
         {
-            minorTickValues = this.CreateDateTimeTickValues(
-                this.ActualMinimum, this.ActualMaximum, this.ActualMinorStep, this.actualMinorIntervalType);
             majorTickValues = this.CreateDateTimeTickValues(
                 this.ActualMinimum, this.ActualMaximum, this.ActualMajorStep, this.actualIntervalType);
+            var minorTickValuesLocal = new List<double>();
+            for (int i = 1; i < majorTickValues.Count; i++)
+            {
+                var min = majorTickValues[i - 1];
+                var max = majorTickValues[i];
+                var current = min;
+                while ((current += this.ActualMinorStep) < max)
+                    minorTickValuesLocal.Add(current);
+            }
+            minorTickValues = minorTickValuesLocal;
             majorLabelValues = majorTickValues;
         }
 
@@ -236,14 +274,25 @@ namespace OxyPlot.Axes
         internal override void UpdateIntervals(OxyRect plotArea)
         {
             base.UpdateIntervals(plotArea);
+            this.ActualMinorStep = base.CalculateMinorInterval(this.ActualMajorStep);
+            var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
+            var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
+            bool bCrossesYearBoundary = false;
+            bool bCrossesDayBoundary = false;
+            bool bCrossesAMPM = false;
+            if (startTime.Year != endTime.Year || startTime.Year != DateTime.Now.Year)
+                bCrossesYearBoundary = true;
+            if (startTime.Day != endTime.Day)
+                bCrossesDayBoundary = true;
+            if (startTime.Hour < 12 ^ endTime.Hour > 12)
+                bCrossesAMPM = true;
             switch (this.actualIntervalType)
             {
                 case DateTimeIntervalType.Years:
-                    this.ActualMinorStep = 31;
                     this.actualMinorIntervalType = DateTimeIntervalType.Years;
                     if (this.ActualStringFormat == null)
                     {
-                        this.ActualStringFormat = "yyyy";
+                        this.ActualStringFormat = "dd MMM\nyyyy";
                     }
 
                     break;
@@ -251,7 +300,10 @@ namespace OxyPlot.Axes
                     this.actualMinorIntervalType = DateTimeIntervalType.Months;
                     if (this.ActualStringFormat == null)
                     {
-                        this.ActualStringFormat = "yyyy-MM-dd";
+                        if (bCrossesYearBoundary)
+                            this.ActualStringFormat = "dd MMM\nyyyy";
+                        else
+                            this.ActualStringFormat = "dd MMM";
                     }
 
                     break;
@@ -266,30 +318,45 @@ namespace OxyPlot.Axes
 
                     break;
                 case DateTimeIntervalType.Days:
-                    this.ActualMinorStep = this.ActualMajorStep;
                     if (this.ActualStringFormat == null)
                     {
-                        this.ActualStringFormat = "yyyy-MM-dd";
+                        if (bCrossesYearBoundary)
+                            this.ActualStringFormat = "dd MMM\nyyyy";
+                        else
+                            this.ActualStringFormat = "dd MMM";
                     }
 
                     break;
                 case DateTimeIntervalType.Hours:
-                    this.ActualMinorStep = this.ActualMajorStep;
                     if (this.ActualStringFormat == null)
                     {
-                        this.ActualStringFormat = "HH:mm";
+                        if (bCrossesYearBoundary)
+                            this.ActualStringFormat = "hh:mm tt\ndd MMM yyyy";
+                        else if (bCrossesDayBoundary)
+                            this.ActualStringFormat = "hh:mm tt\ndd MMM";
+                        else
+                            this.ActualStringFormat = "hh:mm tt";
                     }
 
                     break;
                 case DateTimeIntervalType.Minutes:
-                    this.ActualMinorStep = this.ActualMajorStep;
                     if (this.ActualStringFormat == null)
                     {
-                        this.ActualStringFormat = "HH:mm";
+                        if (bCrossesAMPM)
+                            this.ActualStringFormat = "hh:mm tt";
+                        else
+                            this.ActualStringFormat = "hh:mm";
                     }
 
                     break;
                 case DateTimeIntervalType.Seconds:
+                    this.ActualMinorStep = this.ActualMajorStep;
+                    if (this.ActualStringFormat == null)
+                    {
+                        this.ActualStringFormat = "HH:mm:ss";
+                    }
+                    break;
+                case DateTimeIntervalType.Milliseconds:
                     this.ActualMinorStep = this.ActualMajorStep;
                     if (this.ActualStringFormat == null)
                     {
@@ -333,18 +400,6 @@ namespace OxyPlot.Axes
             return string.Format(this.ActualCulture, fmt, time);
         }
 
-        private static int[] _niceMillisecondIntervals = new[] { 1, 5, 10, 50, 100, 250, 500, 1000 };
-        private static int[] _niceSecondIntervals = new[] { 1, 2, 5, 10, 15, 30, 60 };
-        private static int[] _niceSecondNumbers = new[] { 5, 10, 15, 30, 45, 60 };
-        private static int[] _niceMinuteIntervals = new[] { 1, 2, 3, 5, 10, 15, 20, 30, 45, 60 };
-        private static int[] _niceMinuteNumbers = new[] { 5, 10, 15, 30, 45, 60 };
-        private static double[] _niceHourIntervals = new[] { 1, 1.5, 2, 3, 4, 6, 8, 12 };
-        private static int[] _niceHourNumbers = new[] { 0, 3, 6, 9, 12, 15, 18, 21 };
-        private static int[] _niceDayNumbers = new[] { 1, 15 };
-        private static int[] _niceMonthIntervals = new[] { 1, 3, 6, 12, 18, 24 };
-        private static int[] _niceMonthNumbers = new[] { 1, 7, 4, 10 };
-        private const double AVERAGE_DAYS_PER_MONTH = 30.4377;
-        private const double AVERAGE_DAYS_PER_YEAR = 365.2524;
 
         /// <summary>
         /// Calculates the actual interval.
@@ -356,11 +411,11 @@ namespace OxyPlot.Axes
         {
             double factor = 0.5;
             int numLabels = (int)(availableSize / maxIntervalSize);
-            double dRange = Math.Abs(this.ActualMinimum - this.ActualMaximum);
+            double dRange = Math.Abs(this.ActualMinimum - this.ActualMaximum) / numLabels;
             var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
             var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
             DateTime? startingTick = null;
-            var range = TimeSpanAxis.ToTimeSpan(dRange);
+            var range = ToTimeSpan(dRange);
             double interval = 1.0;
             if (range.TotalDays > 365)
             {
@@ -376,7 +431,7 @@ namespace OxyPlot.Axes
                     startingTick = startTime.FirstOfFollowingYear();
                 int numMonthsToAdd = (int)((range.TotalDays / AVERAGE_DAYS_PER_YEAR) * 4 + 0.5) * 3;
                 // Interval
-                interval = TimeSpanAxis.ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
+                interval = ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
             }
             else if (range.TotalDays > 28)
             {
@@ -389,7 +444,7 @@ namespace OxyPlot.Axes
                 //    bHalfMonth = true;
                 double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGE_DAYS_PER_MONTH;
                 // Interval
-                interval = TimeSpanAxis.ToDouble(TimeSpan.FromDays(daysToAdd));
+                interval = ToDouble(TimeSpan.FromDays(daysToAdd));
             }
             else if (range.TotalDays > 1)
             {
@@ -403,7 +458,7 @@ namespace OxyPlot.Axes
                 else
                     startingTick = startTime.NextDay();
                 // Interval
-                interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
                     (int)range.TotalDays, (int)range.TotalDays + 1, numLabels, 86400));
             }
             else if (range.TotalMinutes > 50)
@@ -434,7 +489,7 @@ namespace OxyPlot.Axes
                         minutesToAdd = (int)(_niceHourIntervals[i] * 60);
                         break;
                     }
-                interval = TimeSpanAxis.ToDouble(TimeSpan.FromMinutes(minutesToAdd));
+                interval = ToDouble(TimeSpan.FromMinutes(minutesToAdd));
             }
             else if (range.TotalSeconds > 50)
             {
@@ -449,7 +504,7 @@ namespace OxyPlot.Axes
                         secondsToAdd = (int)(_niceMinuteIntervals[i] * 60);
                         break;
                     }
-                interval = TimeSpanAxis.ToDouble(TimeSpan.FromSeconds(secondsToAdd));
+                interval = ToDouble(TimeSpan.FromSeconds(secondsToAdd));
             }
             else if (range.TotalSeconds > 1)
             {
@@ -461,7 +516,7 @@ namespace OxyPlot.Axes
                 {
                     if (range.TotalSeconds < _niceSecondIntervals[i])
                     {
-                        interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
                             _niceSecondIntervals[i - 1], _niceSecondIntervals[i], numLabels, 1));
                         break;
                     }
@@ -477,7 +532,7 @@ namespace OxyPlot.Axes
                 {
                     if (range.TotalMilliseconds < _niceMillisecondIntervals[i])
                     {
-                        interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
                             _niceMillisecondIntervals[i - 1], _niceMillisecondIntervals[i], numLabels, 0.001));
                         break;
                     }
@@ -559,11 +614,11 @@ namespace OxyPlot.Axes
             var values = new Collection<double>();
             double factor = 1.0;
             int numLabels = (int)((max - min) / step);
-            double dRange = Math.Abs(max - min);
-            var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
-            var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
+            double dRange = Math.Abs(max - min)/numLabels;
+            var startTime = ToDateTime(Math.Min(min, max));
+            var endTime = ToDateTime(Math.Max(min, max));
             DateTime? startingTick = null;
-            var range = TimeSpanAxis.ToTimeSpan(step);
+            var range = ToTimeSpan(step);
             double interval = 1.0;
             DateTime nextTick;
             if (range.TotalDays > 365)
@@ -583,7 +638,7 @@ namespace OxyPlot.Axes
                 int numMonthsToAdd = (int)((range.TotalDays / AVERAGE_DAYS_PER_YEAR) * 4 + 0.5) * 3;
                 while ((nextTick = nextTick.AddMonths(numMonthsToAdd)) < endTime)
                     values.Add(ToDouble(nextTick));
-                interval = TimeSpanAxis.ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
+                interval = ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
             }
             else if (range.TotalDays > 28)
             {
@@ -629,7 +684,9 @@ namespace OxyPlot.Axes
                     startingTick = nextNiceDay;
                 }
                 else
+                {
                     startingTick = startTime.NextDay();
+                }
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
 
@@ -662,11 +719,13 @@ namespace OxyPlot.Axes
                 // Interval
                 int minutesToAdd = ((int)((range.TotalMinutes / 30.0) + 0.9)) * 30;
                 for (int i = 0; i < _niceHourIntervals.Length; i++)
+                {
                     if (minutesToAdd / 60.0 <= _niceHourIntervals[i])
                     {
                         minutesToAdd = (int)(_niceHourIntervals[i] * 60);
                         break;
                     }
+                }
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
                 while ((nextTick = nextTick + TimeSpan.FromMinutes(minutesToAdd)) < endTime)
@@ -700,14 +759,14 @@ namespace OxyPlot.Axes
                 {
                     if (range.TotalSeconds < _niceSecondIntervals[i])
                     {
-                        interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
                             _niceSecondIntervals[i - 1], _niceSecondIntervals[i], numLabels, 1));
                         break;
                     }
                 }
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
-                var tsSec = TimeSpanAxis.ToTimeSpan(interval);
+                var tsSec = ToTimeSpan(interval);
                 while ((nextTick = nextTick + tsSec) < endTime)
                     values.Add(ToDouble(nextTick));
             }
@@ -720,14 +779,14 @@ namespace OxyPlot.Axes
                 {
                     if (range.TotalMilliseconds < _niceMillisecondIntervals[i])
                     {
-                        interval = TimeSpanAxis.ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
+                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
                             _niceMillisecondIntervals[i - 1], _niceMillisecondIntervals[i], numLabels, 0.001));
                         break;
                     }
                 }
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
-                var diffMilSec = TimeSpanAxis.ToTimeSpan(interval);
+                var diffMilSec = ToTimeSpan(interval);
                 while ((nextTick = nextTick + diffMilSec) < endTime)
                     values.Add(ToDouble(nextTick));
             }
