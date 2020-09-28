@@ -55,9 +55,9 @@ namespace OxyPlot.Axes
 
         private static int[] _niceMillisecondIntervals = new[] { 1, 5, 10, 50, 100, 250, 500, 1000 };
         private static int[] _niceSecondIntervals = new[] { 1, 2, 5, 10, 15, 30, 60 };
-        private static int[] _niceSecondNumbers = new[] { 5, 10, 15, 30, 45, 60 };
+        private static int[] _niceSecondNumbers = new[] { 1, 2, 5, 10, 15, 30, 45, 60 };
         private static int[] _niceMinuteIntervals = new[] { 1, 2, 3, 5, 10, 15, 20, 30, 45, 60 };
-        private static int[] _niceMinuteNumbers = new[] { 5, 10, 15, 30, 45, 60 };
+        private static int[] _niceMinuteNumbers = new[] { 1, 2, 5, 10, 15, 30, 45, 60 };
         private static double[] _niceHourIntervals = new[] { 1, 1.5, 2, 3, 4, 6, 8, 12, 24 };
         private static int[] _niceHourNumbers = new[] { 0, 3, 6, 9, 12, 15, 18, 21 };
         private static int[] _niceDayNumbers = new[] { 1, 15 };
@@ -253,7 +253,6 @@ namespace OxyPlot.Axes
         public override void GetTickValues(
             out IList<double> majorLabelValues, out IList<double> majorTickValues, out IList<double> minorTickValues)
         {
-            System.Diagnostics.Debug.WriteLine($"In GetTickValues");
             majorTickValues = this.CreateDateTimeTickValues(
                 this.ActualMinimum, this.ActualMaximum, this.ActualMajorStep, this.actualIntervalType);
             var minorTickValuesLocal = new List<double>();
@@ -305,7 +304,6 @@ namespace OxyPlot.Axes
         /// <param name="plotArea">The plot area.</param>
         internal override void UpdateIntervals(OxyRect plotArea)
         {
-            System.Diagnostics.Debug.WriteLine($"In UpdateIntervals");
             base.UpdateIntervals(plotArea);
             this.ActualMinorStep = base.CalculateMinorInterval(this.ActualMajorStep);
             var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
@@ -359,14 +357,14 @@ namespace OxyPlot.Axes
                 case DateTimeIntervalType.Hours:
                     if (this.ActualStringFormat == null)
                     {
-                        this.ActualStringFormat = "hh:mm tt";
+                        this.ActualStringFormat = "h:mm tt";
                     }
 
                     break;
                 case DateTimeIntervalType.Minutes:
                     if (this.ActualStringFormat == null)
                     {
-                        this.ActualStringFormat = "hh:mm";
+                        this.ActualStringFormat = "h:mm";
                     }
 
                     break;
@@ -463,58 +461,58 @@ namespace OxyPlot.Axes
                             break;
                         case DateTimeIntervalType.Hours:
                             if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
-                                fmt = "hh:mm tt\nMMM d yyyy";
+                                fmt = "h:mm tt\nMMM d yyyy";
                             else if (landmarkCrossingType == LandmarkType.Month || landmarkCrossingType == LandmarkType.Day || landmarkCrossingType == LandmarkType.None)
-                                fmt = "hh:mm tt\nMMM d";
+                                fmt = "h:mm tt\nMMM d";
                             break;
                         case DateTimeIntervalType.Minutes:
                             if (landmarkCrossingType == LandmarkType.None)
                             {
                                 if ((LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
-                                    fmt = "hh:mm tt\nMMM d yyyy";
+                                    fmt = "h:mm tt\nMMM d yyyy";
                                 else if ((LandmarkBoundariesCrossed & LandmarkType.Day) > 0)
-                                    fmt = "hh:mm tt\nMMM d";
+                                    fmt = "h:mm tt\nMMM d";
                             }
                             else if (landmarkCrossingType == LandmarkType.Year)
-                                fmt = "hh:mm tt\nMMM d yyyy";
+                                fmt = "h:mm tt\nMMM d yyyy";
                             else if (landmarkCrossingType == LandmarkType.Month || landmarkCrossingType == LandmarkType.Day)
-                                fmt = "hh:mm tt\nMMM d";
+                                fmt = "h:mm tt\nMMM d";
                             else if (landmarkCrossingType == LandmarkType.AMPM)
-                                fmt = "hh:mm tt";
+                                fmt = "h:mm tt";
                             break;
                         case DateTimeIntervalType.Seconds:
                             if (landmarkCrossingType == LandmarkType.None)
                             {
                                 if ((LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
-                                    fmt = "HH:mm:ss\nMMM d yyyy";
+                                    fmt = "h:mm:ss tt\nMMM d yyyy";
                                 else if ((LandmarkBoundariesCrossed & LandmarkType.Day) > 0)
-                                    fmt = "HH:mm:ss\nMMM d";
+                                    fmt = "h:mm:ss tt\nMMM d";
                                 else
-                                    fmt = "hh:mm:ss tt";
+                                    fmt = "h:mm:ss tt";
                             }
                             if (landmarkCrossingType == LandmarkType.Year)
-                                fmt = "HH:mm:ss\nMMM d yyyy";
+                                fmt = "h:mm:ss tt\nMMM d yyyy";
                             else if (landmarkCrossingType == LandmarkType.Month || landmarkCrossingType == LandmarkType.Day)
-                                fmt = "HH:mm:ss\nMMM d";
+                                fmt = "h:mm:ss tt\nMMM d";
                             else if (landmarkCrossingType == LandmarkType.Hour)
-                                fmt = "hh:mm:ss tt";
+                                fmt = "h:mm:ss tt";
                             break;
                         case DateTimeIntervalType.Milliseconds:
                             if (landmarkCrossingType == LandmarkType.None)
                             {
                                 if ((LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
-                                    fmt = "HH:mm:ss.fff\nMMM d yyyy";
+                                    fmt = "h:mm:ss.fff tt\nMMM d yyyy";
                                 else if ((LandmarkBoundariesCrossed & LandmarkType.Day) > 0)
-                                    fmt = "HH:mm:ss.fff\nMMM d";
+                                    fmt = "h:mm:ss.fff tt\nMMM d";
                                 else
-                                    fmt = "hh:mm:ss.fff tt";
+                                    fmt = "h:mm:ss.fff tt";
                             }
                             if (landmarkCrossingType == LandmarkType.Year)
-                                fmt = "HH:mm:ss.fff\nMMM d yyyy";
+                                fmt = "h:mm:ss.fff tt\nMMM d yyyy";
                             else if (landmarkCrossingType == LandmarkType.Month || landmarkCrossingType == LandmarkType.Day)
-                                fmt = "HH:mm:ss.fff\nMMM d";
+                                fmt = "h:mm:ss.fff tt\nMMM d";
                             else if (landmarkCrossingType == LandmarkType.Hour)
-                                fmt = "hh:mm:ss.fff tt"; 
+                                fmt = "h:mm:ss.fff tt"; 
                             break;
                         case DateTimeIntervalType.Manual:
                             break;
@@ -555,9 +553,8 @@ namespace OxyPlot.Axes
         /// <returns>The calculate actual interval.</returns>
         protected override double CalculateActualInterval(double availableSize, double maxIntervalSize)
         {
-            System.Diagnostics.Debug.WriteLine($"In CalculateActualInterval with {availableSize} and {maxIntervalSize}");
             double factor = 0.5;
-            int numLabels = (int)(availableSize / 100);
+            int numLabels = (int)(availableSize / maxIntervalSize);
             double dRange = Math.Abs(this.ActualMinimum - this.ActualMaximum) / numLabels;
             var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
             var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
@@ -762,7 +759,6 @@ namespace OxyPlot.Axes
         private IList<double> CreateDateTickValues(
             double min, double max, double step, DateTimeIntervalType intervalType)
         {
-            System.Diagnostics.Debug.WriteLine($"In CreateDateTickValues with min={min}, max={max}, step={step}");
             var values = new Collection<double>();
             double factor = 1.0;
             int numLabels = (int)((max - min) / step);
@@ -909,7 +905,7 @@ namespace OxyPlot.Axes
                 // Interval
                 for (int i = 1; i < _niceSecondIntervals.Length; i++)
                 {
-                    if (range.TotalSeconds < _niceSecondIntervals[i])
+                    if (range.TotalSeconds <= _niceSecondIntervals[i])
                     {
                         interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
                             _niceSecondIntervals[i - 1], _niceSecondIntervals[i], numLabels, 1));
@@ -929,7 +925,7 @@ namespace OxyPlot.Axes
                 // Interval
                 for (int i = 1; i < _niceMillisecondIntervals.Length; i++)
                 {
-                    if (range.TotalMilliseconds < _niceMillisecondIntervals[i])
+                    if (range.TotalMilliseconds <= _niceMillisecondIntervals[i])
                     {
                         interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
                             _niceMillisecondIntervals[i - 1], _niceMillisecondIntervals[i], numLabels, 0.001));
@@ -957,7 +953,6 @@ namespace OxyPlot.Axes
         private IList<double> CreateDateTimeTickValues(
             double min, double max, double interval, DateTimeIntervalType intervalType)
         {
-            System.Diagnostics.Debug.WriteLine($"In CreateDateTimeTickValues with min={min}, max={max}, interval={interval}");
             return this.CreateDateTickValues(min, max, interval, intervalType);
         }
 
