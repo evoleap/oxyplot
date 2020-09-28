@@ -583,6 +583,20 @@ namespace OxyPlot.Wpf
                 {
                     dy = -size.Height;
                 }
+                if (text.Contains('\n') && halign != HorizontalAlignment.Left)
+                {
+                    this.canvas.Children.Remove(tb);
+                    var lines = text.Split('\n');
+                    var lineHeight = size.Height / lines.Length;
+                    var px = p.X;
+                    var py = p.Y + dy;
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        py = py + i * lineHeight;
+                        DrawText(new ScreenPoint(px, py), lines[i], fill, fontFamily, fontSize, fontWeight, rotate, halign, VerticalAlignment.Top, maxSize);
+                    }
+                    return;
+                }
             }
 
             var transform = new TransformGroup();
