@@ -9,12 +9,12 @@
 
 namespace OxyPlot.Axes
 {
-    using OxyPlot.Utilities;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
     using System.Linq;
+    using OxyPlot.Utilities;
 
     /// <summary>
     /// Represents an axis presenting <see cref="System.DateTime" /> values.
@@ -27,16 +27,16 @@ namespace OxyPlot.Axes
     /// <code>"h:mm"</code> shows hours and minutes</remarks>
     public class DateTimeAxis : LinearAxis
     {
-        [Flags]
-        enum LandmarkType
-        {
-            None,
-            AMPM,
-            Hour,
-            Day,
-            Month,
-            Year
-        }
+        /// <summary>
+        /// Average days per month
+        /// </summary>
+        private const double AVERAGEDAYSPERMONTH = 30.4377;
+
+        /// <summary>
+        /// Average days per year
+        /// </summary>
+        private const double AVERAGEDAYSPERYEAR = 365.2524;
+
         /// <summary>
         /// The time origin.
         /// </summary>
@@ -53,18 +53,55 @@ namespace OxyPlot.Axes
         /// </summary>
         private static readonly double MinDayValue = (DateTime.MinValue - TimeOrigin).TotalDays;
 
-        private static int[] _niceMillisecondIntervals = new[] { 1, 5, 10, 50, 100, 250, 500, 1000 };
-        private static int[] _niceSecondIntervals = new[] { 1, 2, 5, 10, 15, 30, 60 };
-        private static int[] _niceSecondNumbers = new[] { 1, 2, 5, 10, 15, 30, 45, 60 };
-        private static int[] _niceMinuteIntervals = new[] { 1, 2, 3, 5, 10, 15, 20, 30, 45, 60 };
-        private static int[] _niceMinuteNumbers = new[] { 1, 2, 5, 10, 15, 30, 45, 60 };
-        private static double[] _niceHourIntervals = new[] { 1, 1.5, 2, 3, 4, 6, 8, 12, 24 };
-        private static int[] _niceHourNumbers = new[] { 0, 3, 6, 9, 12, 15, 18, 21 };
-        private static int[] _niceDayNumbers = new[] { 1, 15 };
-        private static int[] _niceMonthIntervals = new[] { 1, 3, 6, 12, 18, 24 };
-        private static int[] _niceMonthNumbers = new[] { 1, 7, 4, 10 };
-        private const double AVERAGE_DAYS_PER_MONTH = 30.4377;
-        private const double AVERAGE_DAYS_PER_YEAR = 365.2524;
+        /// <summary>
+        /// Good intervals to use for milliseconds
+        /// </summary>
+        private static int[] niceMillisecondIntervals = new[] { 1, 5, 10, 50, 100, 250, 500, 1000 };
+
+        /// <summary>
+        /// Good intervals to use for seconds
+        /// </summary>
+        private static int[] niceSecondIntervals = new[] { 1, 2, 5, 10, 15, 30, 60 };
+
+        /// <summary>
+        /// Good numbers to use for seconds
+        /// </summary>
+        private static int[] niceSecondNumbers = new[] { 1, 2, 5, 10, 15, 30, 45, 60 };
+
+        /// <summary>
+        /// Good intervals to use for minutes
+        /// </summary>
+        private static int[] niceMinuteIntervals = new[] { 1, 2, 3, 5, 10, 15, 20, 30, 45, 60 };
+
+        /// <summary>
+        /// Good numbers to use for minutes
+        /// </summary>
+        private static int[] niceMinuteNumbers = new[] { 1, 2, 5, 10, 15, 30, 45, 60 };
+
+        /// <summary>
+        /// Good intervals to use for hours
+        /// </summary>
+        private static double[] niceHourIntervals = new[] { 1, 1.5, 2, 3, 4, 6, 8, 12, 24 };
+
+        /// <summary>
+        /// Good numbers to use for hours
+        /// </summary>
+        private static int[] niceHourNumbers = new[] { 0, 3, 6, 9, 12, 15, 18, 21 };
+
+        /// <summary>
+        /// Good numbers to use for days
+        /// </summary>
+        private static int[] niceDayNumbers = new[] { 1, 15 };
+
+        /// <summary>
+        /// Good intervals to use for months
+        /// </summary>
+        private static int[] niceMonthIntervals = new[] { 1, 3, 6, 12, 18, 24 };
+
+        /// <summary>
+        /// Good numbers to use for months
+        /// </summary>
+        private static int[] niceMonthNumbers = new[] { 1, 7, 4, 10 };
 
         /// <summary>
         /// The actual interval type.
@@ -75,11 +112,13 @@ namespace OxyPlot.Axes
         /// The actual minor interval type.
         /// </summary>
         private DateTimeIntervalType actualMinorIntervalType;
+
         /// <summary>
         /// Local list of major tick values stored in order to determine if
         /// labels are landmark labels at the time of formatting
         /// </summary>
-        private List<double> _majorTickValues;
+        private List<double> majorTickValues;
+
         /// <summary>
         /// Initializes a new instance of the <see cref = "DateTimeAxis" /> class.
         /// </summary>
@@ -137,6 +176,43 @@ namespace OxyPlot.Axes
         }
 
         /// <summary>
+        /// Type of date/time landmark for definition
+        /// </summary>
+        [Flags]
+        internal enum LandmarkType
+        {
+            /// <summary>
+            /// No date/time landmark
+            /// </summary>
+            None,
+
+            /// <summary>
+            /// AM or PM
+            /// </summary>
+            AMPM,
+
+            /// <summary>
+            /// Hour of day (or am/pm)
+            /// </summary>
+            Hour,
+
+            /// <summary>
+            /// Day of month
+            /// </summary>
+            Day,
+
+            /// <summary>
+            /// Month of year
+            /// </summary>
+            Month,
+
+            /// <summary>
+            /// Year designator
+            /// </summary>
+            Year
+        }
+
+        /// <summary>
         /// Gets or sets CalendarWeekRule.
         /// </summary>
         public CalendarWeekRule CalendarWeekRule { get; set; }
@@ -155,11 +231,6 @@ namespace OxyPlot.Axes
         /// Gets or sets MinorIntervalType.
         /// </summary>
         public DateTimeIntervalType MinorIntervalType { get; set; }
-        /// <summary>
-        /// Boolean flag indicating if the range of date-time plotted
-        /// crosses a day boundary
-        /// </summary>
-        private LandmarkType LandmarkBoundariesCrossed { get; set; }
 
         /// <summary>
         /// Gets or sets the time zone (used when formatting date/time values).
@@ -167,6 +238,12 @@ namespace OxyPlot.Axes
         /// <value>The time zone info.</value>
         /// <remarks>No date/time conversion will be performed if this property is <c>null</c>.</remarks>
         public TimeZoneInfo TimeZone { get; set; }
+
+        /// <summary>
+        /// Gets or sets Boolean flag indicating if the range of date-time plotted
+        /// crosses a day boundary
+        /// </summary>
+        private LandmarkType LandmarkBoundariesCrossed { get; set; }
 
         /// <summary>
         /// Creates a data point.
@@ -226,6 +303,7 @@ namespace OxyPlot.Axes
             var span = value - TimeOrigin;
             return span.TotalDays + 1;
         }
+
         /// <summary>
         /// Converts a DateTime to days after the time origin.
         /// </summary>
@@ -235,6 +313,7 @@ namespace OxyPlot.Axes
         {
             return span.TotalDays;
         }
+
         /// <summary>
         /// Converts a a double (number of days) to a TimeSpan
         /// </summary>
@@ -244,6 +323,7 @@ namespace OxyPlot.Axes
         {
             return TimeSpan.FromDays(totalDays);
         }
+
         /// <summary>
         /// Gets the tick values.
         /// </summary>
@@ -264,20 +344,24 @@ namespace OxyPlot.Axes
                 {
                     var current = max;
                     while ((current -= this.ActualMinorStep) > min)
+                    {
                         minorTickValuesLocal.Add(current);
-
+                    }
                 }
                 else
                 {
                     var current = min;
                     var step = (i == majorTickValues.Count) ? this.ActualMinorStep : CalculateMinorInterval(max - min);
                     while ((current += step) < max)
+                    {
                         minorTickValuesLocal.Add(current);
+                    }
                 }
             }
+
             minorTickValues = minorTickValuesLocal;
             majorLabelValues = majorTickValues;
-            _majorTickValues = majorTickValues.ToList();
+            this.majorTickValues = majorTickValues.ToList();
         }
 
         /// <summary>
@@ -305,20 +389,35 @@ namespace OxyPlot.Axes
         internal override void UpdateIntervals(OxyRect plotArea)
         {
             base.UpdateIntervals(plotArea);
-            this.ActualMinorStep = base.CalculateMinorInterval(this.ActualMajorStep);
+            this.ActualMinorStep = this.CalculateMinorInterval(this.ActualMajorStep);
             var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
             var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
-            LandmarkBoundariesCrossed = LandmarkType.None;
+            this.LandmarkBoundariesCrossed = LandmarkType.None;
             if (startTime.Year != endTime.Year || startTime.Year != DateTime.Now.Year)
-                LandmarkBoundariesCrossed = LandmarkBoundariesCrossed | LandmarkType.Year;
-            if (startTime.Month!= endTime.Month)
-                LandmarkBoundariesCrossed = LandmarkBoundariesCrossed | LandmarkType.Month;
+            {
+                this.LandmarkBoundariesCrossed = this.LandmarkBoundariesCrossed | LandmarkType.Year;
+            }
+
+            if (startTime.Month != endTime.Month)
+            {
+                this.LandmarkBoundariesCrossed = this.LandmarkBoundariesCrossed | LandmarkType.Month;
+            }
+
             if (startTime.Day != endTime.Day)
-                LandmarkBoundariesCrossed = LandmarkBoundariesCrossed | LandmarkType.Day;
+            {
+                this.LandmarkBoundariesCrossed = this.LandmarkBoundariesCrossed | LandmarkType.Day;
+            }
+
             if (startTime.Hour != endTime.Hour || (endTime - startTime) > TimeSpan.FromHours(1))
-                LandmarkBoundariesCrossed = LandmarkBoundariesCrossed | LandmarkType.Hour;
+            {
+                this.LandmarkBoundariesCrossed = this.LandmarkBoundariesCrossed | LandmarkType.Hour;
+            }
+
             if (startTime.Hour < 12 ^ endTime.Hour > 12 || (endTime - startTime) > TimeSpan.FromHours(12))
-                LandmarkBoundariesCrossed = LandmarkBoundariesCrossed | LandmarkType.AMPM;
+            {
+                this.LandmarkBoundariesCrossed = this.LandmarkBoundariesCrossed | LandmarkType.AMPM;
+            }
+
             switch (this.actualIntervalType)
             {
                 case DateTimeIntervalType.Years:
@@ -369,14 +468,15 @@ namespace OxyPlot.Axes
 
                     break;
                 case DateTimeIntervalType.Seconds:
-                    //this.ActualMinorStep = this.ActualMajorStep;
+                    // this.ActualMinorStep = this.ActualMajorStep;
                     if (this.ActualStringFormat == null)
                     {
                         this.ActualStringFormat = "mm:ss";
                     }
+
                     break;
                 case DateTimeIntervalType.Milliseconds:
-                    //this.ActualMinorStep = this.ActualMajorStep;
+                    // this.ActualMinorStep = this.ActualMajorStep;
                     if (this.ActualStringFormat == null)
                     {
                         this.ActualStringFormat = "mm:ss.fff";
@@ -391,128 +491,200 @@ namespace OxyPlot.Axes
         }
 
         /// <summary>
+        /// Recalculate the actual interval and update the interval type
+        /// </summary>
+        /// <param name="plotArea">The size of the plot area</param>
+        internal void UpdateIntervalType(OxyRect plotArea)
+        {
+            double labelSize = this.IntervalLength;
+            double length = this.IsHorizontal() ? plotArea.Width : plotArea.Height;
+            length *= Math.Abs(this.EndPosition - this.StartPosition);
+
+            this.CalculateActualInterval(length, labelSize);
+        }
+
+        /// <summary>
         /// Formats the value to be used on the axis.
         /// </summary>
         /// <param name="x">The value to format.</param>
         /// <returns>The formatted value.</returns>
         protected override string FormatValueOverride(double x)
         {
-            var time = ConvertToLocalTime(x);
-
-            string fmt = this.ActualStringFormat;
-            if (fmt == null)
+            var time = this.ConvertToLocalTime(x);
+            string fmt = this.ActualStringFormat ?? this.StringFormat ?? string.Empty;
+            if (string.IsNullOrEmpty(fmt))
             {
                 return time.ToString(CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern);
             }
-            if (_majorTickValues != null)
+
+            if (this.majorTickValues != null)
             {
                 bool isLandmark = false;
                 LandmarkType landmarkCrossingType = LandmarkType.None;
-                if (_majorTickValues[0] == x)
+                if (this.majorTickValues[0] == x)
+                {
                     isLandmark = true;
+                }
                 else
                 {
-                    for (int i = 1; i < _majorTickValues.Count; i++)
+                    for (int i = 1; i < this.majorTickValues.Count; i++)
                     {
-                        if (_majorTickValues[i] == x)
+                        if (this.majorTickValues[i] == x)
                         {
-                            var lastTick = ConvertToLocalTime(_majorTickValues[i - 1]);
-                            if ((LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
+                            var lastTick = this.ConvertToLocalTime(this.majorTickValues[i - 1]);
+                            if ((this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
                             {
-                                isLandmark = (lastTick.Year < time.Year);
+                                isLandmark = lastTick.Year < time.Year;
                                 landmarkCrossingType = LandmarkType.Year;
                             }
-                            if (!isLandmark && ((LandmarkBoundariesCrossed & LandmarkType.Month) > 0))
+
+                            if (!isLandmark && ((this.LandmarkBoundariesCrossed & LandmarkType.Month) > 0))
                             {
-                                isLandmark = (lastTick.Month < time.Month);
+                                isLandmark = lastTick.Month < time.Month;
                                 landmarkCrossingType = LandmarkType.Month;
                             }
-                            if (!isLandmark && ((LandmarkBoundariesCrossed & LandmarkType.Day) > 0))
+
+                            if (!isLandmark && ((this.LandmarkBoundariesCrossed & LandmarkType.Day) > 0))
                             {
-                                isLandmark = (lastTick.Day < time.Day);
+                                isLandmark = lastTick.Day < time.Day;
                                 landmarkCrossingType = LandmarkType.Day;
                             }
-                            if (!isLandmark && ((LandmarkBoundariesCrossed & LandmarkType.Hour) > 0))
+
+                            if (!isLandmark && ((this.LandmarkBoundariesCrossed & LandmarkType.Hour) > 0))
                             {
-                                isLandmark = (lastTick.Hour != time.Hour);
+                                isLandmark = lastTick.Hour != time.Hour;
                                 landmarkCrossingType = LandmarkType.Hour;
                             }
-                            if (!isLandmark && ((LandmarkBoundariesCrossed & LandmarkType.AMPM) > 0))
+
+                            if (!isLandmark && ((this.LandmarkBoundariesCrossed & LandmarkType.AMPM) > 0))
                             {
-                                isLandmark = (lastTick.Hour < 12 && time.Hour > 12);
+                                isLandmark = lastTick.Hour < 12 && time.Hour > 12;
                                 landmarkCrossingType = LandmarkType.AMPM;
                             }
                         }
                     }
                 }
+
                 if (isLandmark)
                 {
                     switch (this.actualIntervalType)
                     {
                         case DateTimeIntervalType.Months:
-                            if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
+                            if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
+                            {
                                 fmt = "MMM d\nyyyy";
+                            }
+
                             break;
                         case DateTimeIntervalType.Days:
-                            if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
-                                fmt = "MMM d\nyyyy"; 
+                            if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
+                            {
+                                fmt = "MMM d\nyyyy";
+                            }
                             else if (landmarkCrossingType == LandmarkType.Month || landmarkCrossingType == LandmarkType.None)
+                            {
                                 fmt = "MMM d";
+                            }
+
                             break;
                         case DateTimeIntervalType.Hours:
-                            if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
+                            if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
+                            {
                                 fmt = "h:mm tt\nMMM d yyyy";
+                            }
                             else if (landmarkCrossingType == LandmarkType.Month || landmarkCrossingType == LandmarkType.Day || landmarkCrossingType == LandmarkType.None)
+                            {
                                 fmt = "h:mm tt\nMMM d";
+                            }
+
                             break;
                         case DateTimeIntervalType.Minutes:
                             if (landmarkCrossingType == LandmarkType.None)
                             {
-                                if ((LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
+                                if ((this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
+                                {
                                     fmt = "h:mm tt\nMMM d yyyy";
-                                else if ((LandmarkBoundariesCrossed & LandmarkType.Day) > 0)
+                                }
+                                else if ((this.LandmarkBoundariesCrossed & LandmarkType.Day) > 0)
+                                {
                                     fmt = "h:mm tt\nMMM d";
+                                }
                             }
                             else if (landmarkCrossingType == LandmarkType.Year)
+                            {
                                 fmt = "h:mm tt\nMMM d yyyy";
+                            }
                             else if (landmarkCrossingType == LandmarkType.Month || landmarkCrossingType == LandmarkType.Day)
+                            {
                                 fmt = "h:mm tt\nMMM d";
+                            }
                             else if (landmarkCrossingType == LandmarkType.AMPM)
+                            {
                                 fmt = "h:mm tt";
+                            }
+
                             break;
                         case DateTimeIntervalType.Seconds:
                             if (landmarkCrossingType == LandmarkType.None)
                             {
-                                if ((LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
+                                if ((this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
+                                {
                                     fmt = "h:mm:ss tt\nMMM d yyyy";
-                                else if ((LandmarkBoundariesCrossed & LandmarkType.Day) > 0)
+                                }
+                                else if ((this.LandmarkBoundariesCrossed & LandmarkType.Day) > 0)
+                                {
                                     fmt = "h:mm:ss tt\nMMM d";
+                                }
                                 else
+                                {
                                     fmt = "h:mm:ss tt";
+                                }
                             }
+
                             if (landmarkCrossingType == LandmarkType.Year)
+                            {
                                 fmt = "h:mm:ss tt\nMMM d yyyy";
+                            }
                             else if (landmarkCrossingType == LandmarkType.Month || landmarkCrossingType == LandmarkType.Day)
+                            {
                                 fmt = "h:mm:ss tt\nMMM d";
+                            }
                             else if (landmarkCrossingType == LandmarkType.Hour)
+                            {
                                 fmt = "h:mm:ss tt";
+                            }
+
                             break;
                         case DateTimeIntervalType.Milliseconds:
                             if (landmarkCrossingType == LandmarkType.None)
                             {
-                                if ((LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
+                                if ((this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0)
+                                {
                                     fmt = "h:mm:ss.fff tt\nMMM d yyyy";
-                                else if ((LandmarkBoundariesCrossed & LandmarkType.Day) > 0)
+                                }
+                                else if ((this.LandmarkBoundariesCrossed & LandmarkType.Day) > 0)
+                                {
                                     fmt = "h:mm:ss.fff tt\nMMM d";
+                                }
                                 else
+                                {
                                     fmt = "h:mm:ss.fff tt";
+                                }
                             }
+
                             if (landmarkCrossingType == LandmarkType.Year)
+                            {
                                 fmt = "h:mm:ss.fff tt\nMMM d yyyy";
+                            }
                             else if (landmarkCrossingType == LandmarkType.Month || landmarkCrossingType == LandmarkType.Day)
+                            {
                                 fmt = "h:mm:ss.fff tt\nMMM d";
-                            else if (landmarkCrossingType == LandmarkType.Hour)
-                                fmt = "h:mm:ss.fff tt"; 
+                            }
+                            else
+                            {
+                                fmt = "h:mm:ss.fff tt";
+                            }
+
                             break;
                         case DateTimeIntervalType.Manual:
                             break;
@@ -522,27 +694,12 @@ namespace OxyPlot.Axes
                 }
             }
 
-
             int week = this.GetWeek(time);
             fmt = fmt.Replace("ww", week.ToString("00"));
             fmt = fmt.Replace("w", week.ToString(CultureInfo.InvariantCulture));
             fmt = string.Concat("{0:", fmt, "}");
 
             return string.Format(this.ActualCulture, fmt, time);
-        }
-
-        private DateTime ConvertToLocalTime(double x)
-        {
-            // convert the double value to a DateTime
-            var time = ToDateTime(x);
-
-            // If a time zone is specified, convert the time
-            if (this.TimeZone != null)
-            {
-                time = TimeZoneInfo.ConvertTime(time, this.TimeZone);
-            }
-
-            return time;
         }
 
         /// <summary>
@@ -555,135 +712,171 @@ namespace OxyPlot.Axes
         {
             double factor = 0.5;
             int numLabels = (int)(availableSize / maxIntervalSize);
-            double dRange = Math.Abs(this.ActualMinimum - this.ActualMaximum) / numLabels;
+            double rangeDbl = Math.Abs(this.ActualMinimum - this.ActualMaximum) / numLabels;
             var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
             var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
             DateTime? startingTick = null;
-            var range = ToTimeSpan(dRange);
+            var range = ToTimeSpan(rangeDbl);
             double interval = 1.0;
+
             if (range.TotalDays > 365)
             {
-
                 // Pick the closest 1st of a nice month
-                for (int i = 0; i < _niceMonthNumbers.Length; i++)
-                    if (startTime.TimeToNextOccurrenceOfMonth(_niceMonthNumbers[i]) < TimeSpan.FromSeconds(range.TotalSeconds * factor))
+                for (int i = 0; i < niceMonthNumbers.Length; i++)
+                {
+                    if (startTime.TimeToNextOccurrenceOfMonth(niceMonthNumbers[i]) < TimeSpan.FromSeconds(range.TotalSeconds * factor))
                     {
-                        startingTick = new DateTime(startTime.Year + (startTime.Month > _niceMonthNumbers[i] ? 1 : 0), _niceMonthNumbers[i], 1, 0, 0, 0, DateTimeKind.Local);
+                        startingTick = new DateTime(startTime.Year + (startTime.Month > niceMonthNumbers[i] ? 1 : 0), niceMonthNumbers[i], 1, 0, 0, 0, DateTimeKind.Local);
                         break;
                     }
+                }
+
                 if (!startingTick.HasValue)
+                {
                     startingTick = startTime.FirstOfFollowingYear();
-                int numMonthsToAdd = (int)((range.TotalDays / AVERAGE_DAYS_PER_YEAR) * 4 + 0.5) * 3;
+                }
+
+                int numMonthsToAdd = (int)(((range.TotalDays / AVERAGEDAYSPERYEAR) * 4) + 0.5) * 3;
+
                 // Interval
-                interval = ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
+                interval = ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGEDAYSPERMONTH));
             }
             else if (range.TotalDays > 28)
             {
-
                 // Pick the closest 1st of a month
                 startingTick = startTime.FirstOfFollowingMonth();
-                //  var bHalfMonth = false;
-                int monthIntTimesTwo = ((int)(range.TotalDays / AVERAGE_DAYS_PER_MONTH * 2.0)) + 1;
-                //if (monthIntTimesTwo % 2 == 1)
-                //    bHalfMonth = true;
-                double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGE_DAYS_PER_MONTH;
+
+                // var bHalfMonth = false;
+                int monthIntTimesTwo = ((int)(range.TotalDays / AVERAGEDAYSPERMONTH * 2.0)) + 1;
+
+                // if (monthIntTimesTwo % 2 == 1) bHalfMonth = true;
+                double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGEDAYSPERMONTH;
+
                 // Interval
                 interval = ToDouble(TimeSpan.FromDays(daysToAdd));
             }
             else if (range.TotalDays > 1)
             {
-
-                var nextNiceDay = startTime.NextNiceDay(_niceDayNumbers);
+                var nextNiceDay = startTime.NextNiceDay(niceDayNumbers);
                 var timeToNextNiceDay = nextNiceDay - startTime;
                 if (timeToNextNiceDay.TotalDays < range.TotalDays * factor)
                 {
                     startingTick = nextNiceDay;
                 }
                 else
+                {
                     startingTick = startTime.NextDay();
+                }
+
                 // Interval
-                interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                    (int)range.TotalDays, (int)range.TotalDays + 1, numLabels, 86400));
+                interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime, (int)range.TotalDays, (int)range.TotalDays + 1, numLabels, 86400));
             }
             else if (range.TotalMinutes > 50)
             {
-
                 // return next nice hour
                 var closestNiceHour = 0;
-                for (int i = 1; i < _niceHourNumbers.Length; i++)
-                    if (startTime.Hour < _niceHourNumbers[i])
+                for (int i = 1; i < niceHourNumbers.Length; i++)
+                {
+                    if (startTime.Hour < niceHourNumbers[i])
                     {
-                        closestNiceHour = _niceHourNumbers[i];
+                        closestNiceHour = niceHourNumbers[i];
                         break;
                     }
+                }
+
                 DateTime closestNiceTime;
                 if (closestNiceHour == 0)
+                {
                     closestNiceTime = startTime.NextDay();
+                }
                 else
+                {
                     closestNiceTime = startTime.Date + TimeSpan.FromHours(closestNiceHour);
+                }
+
                 if ((closestNiceTime - startTime).TotalHours < range.TotalHours * factor)
+                {
                     startingTick = closestNiceTime;
+                }
                 else
+                {
                     startingTick = startTime.Date + TimeSpan.FromHours(startTime.Hour + 1);
+                }
+
                 // Interval
                 int minutesToAdd = ((int)((range.TotalMinutes / 30.0) + 0.9)) * 30;
-                for (int i = 0; i < _niceHourIntervals.Length; i++)
-                    if (minutesToAdd / 60.0 <= _niceHourIntervals[i])
+                for (int i = 0; i < niceHourIntervals.Length; i++)
+                {
+                    if (minutesToAdd / 60.0 <= niceHourIntervals[i])
                     {
-                        minutesToAdd = (int)(_niceHourIntervals[i] * 60);
+                        minutesToAdd = (int)(niceHourIntervals[i] * 60);
                         break;
                     }
+                }
+
                 interval = ToDouble(TimeSpan.FromMinutes(minutesToAdd));
             }
             else if (range.TotalSeconds > 50)
             {
+                TimeSpan diff = startTime.GetToClosestNiceInterval(range, niceMinuteNumbers, (st) => st.Minute, 60.0, factor);
+                startingTick = startTime + diff - TimeSpan.FromSeconds(startTime.Second + (startTime.Millisecond / 1000));
 
-                TimeSpan diff = startTime.GetToClosestNiceInterval(range, _niceMinuteNumbers, (st) => st.Minute, 60.0, factor);
-                startingTick = startTime + diff - TimeSpan.FromSeconds(startTime.Second + startTime.Millisecond / 1000);
                 // Interval
                 int secondsToAdd = ((int)((range.TotalSeconds / 30.0) + 1)) * 30;
-                for (int i = 0; i < _niceMinuteIntervals.Length; i++)
-                    if (secondsToAdd / 60 <= _niceMinuteIntervals[i])
+                for (int i = 0; i < niceMinuteIntervals.Length; i++)
+                {
+                    if (secondsToAdd / 60 <= niceMinuteIntervals[i])
                     {
-                        secondsToAdd = (int)(_niceMinuteIntervals[i] * 60);
+                        secondsToAdd = (int)(niceMinuteIntervals[i] * 60);
                         break;
                     }
+                }
+
                 interval = ToDouble(TimeSpan.FromSeconds(secondsToAdd));
             }
             else if (range.TotalSeconds > 1)
             {
-
-                TimeSpan diffSec = startTime.GetToClosestNiceInterval(range, _niceSecondNumbers, (st) => st.Second, 1.0, factor);
+                TimeSpan diffSec = startTime.GetToClosestNiceInterval(range, niceSecondNumbers, (st) => st.Second, 1.0, factor);
                 startingTick = startTime + diffSec;
+
                 // Interval
-                for (int i = 1; i < _niceSecondIntervals.Length; i++)
+                for (int i = 1; i < niceSecondIntervals.Length; i++)
                 {
-                    if (range.TotalSeconds < _niceSecondIntervals[i])
+                    if (range.TotalSeconds < niceSecondIntervals[i])
                     {
-                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                            _niceSecondIntervals[i - 1], _niceSecondIntervals[i], numLabels, 1));
+                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime, niceSecondIntervals[i - 1], niceSecondIntervals[i], numLabels, 1));
                         break;
                     }
                 }
             }
             else
             {
-
-                TimeSpan diffMicrosec = startTime.GetToClosestNiceInterval(range, _niceMillisecondIntervals, (st) => st.Millisecond, 0.001, factor);
+                TimeSpan diffMicrosec = startTime.GetToClosestNiceInterval(range, niceMillisecondIntervals, (st) => st.Millisecond, 0.001, factor);
                 startingTick = startTime + diffMicrosec;
+
                 // Interval
-                for (int i = 1; i < _niceMillisecondIntervals.Length; i++)
+                for (int i = 1; i < niceMillisecondIntervals.Length; i++)
                 {
-                    if (range.TotalMilliseconds < _niceMillisecondIntervals[i])
+                    if (range.TotalMilliseconds < niceMillisecondIntervals[i])
                     {
-                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                            _niceMillisecondIntervals[i - 1], _niceMillisecondIntervals[i], numLabels, 0.001));
+                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime, niceMillisecondIntervals[i - 1], niceMillisecondIntervals[i], numLabels, 0.001));
                         break;
                     }
                 }
             }
 
-            
+            this.CalculateIntervalType(rangeDbl, interval);
+
+            return interval;
+        }
+
+        /// <summary>
+        /// Based on the range and the interval, calculate the interval type
+        /// </summary>
+        /// <param name="rangeDbl">The current range</param>
+        /// <param name="interval">The current interval</param>
+        private void CalculateIntervalType(double rangeDbl, double interval)
+        {
             this.actualIntervalType = this.IntervalType;
             this.actualMinorIntervalType = this.MinorIntervalType;
 
@@ -694,6 +887,7 @@ namespace OxyPlot.Axes
                 {
                     this.actualIntervalType = DateTimeIntervalType.Seconds;
                 }
+
                 if (interval >= 1.0 / 24 / 60)
                 {
                     this.actualIntervalType = DateTimeIntervalType.Minutes;
@@ -704,17 +898,17 @@ namespace OxyPlot.Axes
                     this.actualIntervalType = DateTimeIntervalType.Hours;
                 }
 
-                if (interval >= 1)
+                if (interval >= 1.0)
                 {
                     this.actualIntervalType = DateTimeIntervalType.Days;
                 }
 
-                if (interval >= AVERAGE_DAYS_PER_MONTH)
+                if (interval >= AVERAGEDAYSPERMONTH)
                 {
                     this.actualIntervalType = DateTimeIntervalType.Months;
                 }
 
-                if (dRange >= AVERAGE_DAYS_PER_YEAR)
+                if (rangeDbl >= AVERAGEDAYSPERYEAR)
                 {
                     this.actualIntervalType = DateTimeIntervalType.Years;
                 }
@@ -739,13 +933,36 @@ namespace OxyPlot.Axes
                     case DateTimeIntervalType.Hours:
                         this.actualMinorIntervalType = DateTimeIntervalType.Minutes;
                         break;
+                    case DateTimeIntervalType.Minutes:
+                        this.actualMinorIntervalType = DateTimeIntervalType.Seconds;
+                        break;
+                    case DateTimeIntervalType.Seconds:
+                        this.actualMinorIntervalType = DateTimeIntervalType.Milliseconds;
+                        break;
                     default:
-                        this.actualMinorIntervalType = DateTimeIntervalType.Days;
+                        this.actualMinorIntervalType = DateTimeIntervalType.Seconds;
                         break;
                 }
             }
+        }
 
-            return interval;
+        /// <summary>
+        /// Convert to local time zone
+        /// </summary>
+        /// <param name="x">The double axis value of the date time</param>
+        /// <returns>The Date Time in this time zone</returns>
+        private DateTime ConvertToLocalTime(double x)
+        {
+            // convert the double value to a DateTime
+            var time = ToDateTime(x);
+
+            // If a time zone is specified, convert the time
+            if (this.TimeZone != null)
+            {
+                time = TimeZoneInfo.ConvertTime(time, this.TimeZone);
+            }
+
+            return time;
         }
 
         /// <summary>
@@ -762,7 +979,7 @@ namespace OxyPlot.Axes
             var values = new Collection<double>();
             double factor = 1.0;
             int numLabels = (int)((max - min) / step);
-            double dRange = Math.Abs(max - min)/numLabels;
+            double rangeDouble = Math.Abs(max - min) / numLabels;
             var startTime = ToDateTime(Math.Min(min, max));
             var endTime = ToDateTime(Math.Max(min, max));
             DateTime? startingTick = null;
@@ -772,60 +989,80 @@ namespace OxyPlot.Axes
             if (range.TotalDays > 365)
             {
                 // Pick the closest 1st of a nice month
-                for (int i = 0; i < _niceMonthNumbers.Length; i++)
-                    if (startTime.TimeToNextOccurrenceOfMonth(_niceMonthNumbers[i]) < TimeSpan.FromSeconds(range.TotalSeconds * factor))
+                for (int i = 0; i < niceMonthNumbers.Length; i++)
+                {
+                    if (startTime.TimeToNextOccurrenceOfMonth(niceMonthNumbers[i]) < TimeSpan.FromSeconds(range.TotalSeconds * factor))
                     {
-                        startingTick = new DateTime(startTime.Year + (startTime.Month > _niceMonthNumbers[i] ? 1 : 0), _niceMonthNumbers[i], 1, 0, 0, 0, DateTimeKind.Local);
+                        startingTick = new DateTime(startTime.Year + (startTime.Month > niceMonthNumbers[i] ? 1 : 0), niceMonthNumbers[i], 1, 0, 0, 0, DateTimeKind.Local);
                         break;
                     }
+                }
+
                 if (!startingTick.HasValue)
+                {
                     startingTick = startTime.FirstOfFollowingYear();
+                }
+
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
+
                 // Interval
-                int numMonthsToAdd = (int)((range.TotalDays / AVERAGE_DAYS_PER_YEAR) * 4 + 0.5) * 3;
+                int numMonthsToAdd = (int)(((range.TotalDays / AVERAGEDAYSPERYEAR) * 4) + 0.5) * 3;
                 while ((nextTick = nextTick.AddMonths(numMonthsToAdd)) < endTime)
+                {
                     values.Add(ToDouble(nextTick));
-                interval = ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGE_DAYS_PER_MONTH));
+                }
+
+                interval = ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGEDAYSPERMONTH));
             }
             else if (range.TotalDays > 28)
             {
-
                 // Pick the closest 1st of a month
                 startingTick = startTime.FirstOfFollowingMonth();
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
 
-                var bHalfMonth = false;
-                int monthIntTimesTwo = ((int)(range.TotalDays / AVERAGE_DAYS_PER_MONTH * 2.0)) + 1;
+                var halfMonth = false;
+                int monthIntTimesTwo = ((int)(range.TotalDays / AVERAGEDAYSPERMONTH * 2.0)) + 1;
                 if (monthIntTimesTwo % 2 == 1)
-                    bHalfMonth = true;
-                double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGE_DAYS_PER_MONTH;
-                var tsDays = TimeSpan.FromDays(daysToAdd);
+                {
+                    halfMonth = true;
+                }
+
+                double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGEDAYSPERMONTH;
+                var days = TimeSpan.FromDays(daysToAdd);
                 while (true)
                 {
-                    nextTick = nextTick + tsDays;
-                    if (nextTick.Day < 5 || nextTick.Day > 25 || !bHalfMonth)
+                    nextTick = nextTick + days;
+                    if (nextTick.Day < 5 || nextTick.Day > 25 || !halfMonth)
                     {
                         if (nextTick.Day > 25)
                         {
                             nextTick = nextTick.FirstOfFollowingMonth();
                         }
                         else
+                        {
                             nextTick = new DateTime(nextTick.Year, nextTick.Month, 1, 0, 0, 0, startTime.Kind);
+                        }
                     }
                     else
+                    {
                         nextTick = new DateTime(nextTick.Year, nextTick.Month, 15, 0, 0, 0, startTime.Kind);
+                    }
+
                     if (nextTick < endTime)
+                    {
                         values.Add(ToDouble(nextTick));
+                    }
                     else
+                    {
                         break;
+                    }
                 }
             }
             else if (range.TotalDays > 1)
             {
-
-                var nextNiceDay = startTime.NextNiceDay(_niceDayNumbers);
+                var nextNiceDay = startTime.NextNiceDay(niceDayNumbers);
                 var timeToNextNiceDay = nextNiceDay - startTime;
                 if (timeToNextNiceDay.TotalDays < range.TotalDays * factor)
                 {
@@ -835,108 +1072,135 @@ namespace OxyPlot.Axes
                 {
                     startingTick = startTime.NextDay();
                 }
+
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
 
                 // Interval
-                var tsInterval = DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                    (int)range.TotalDays, (int)range.TotalDays + 1, numLabels, 86400);
-                while ((nextTick = nextTick + tsInterval) < endTime)
+                var niceInterval = DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime, (int)range.TotalDays, (int)range.TotalDays + 1, numLabels, 86400);
+                while ((nextTick = nextTick + niceInterval) < endTime)
+                {
                     values.Add(ToDouble(nextTick));
+                }
             }
             else if (range.TotalMinutes > 50)
             {
-
                 // return next nice hour
                 var closestNiceHour = 0;
-                for (int i = 1; i < _niceHourNumbers.Length; i++)
-                    if (startTime.Hour < _niceHourNumbers[i])
-                    {
-                        closestNiceHour = _niceHourNumbers[i];
-                        break;
-                    }
-                DateTime closestNiceTime;
-                if (closestNiceHour == 0)
-                    closestNiceTime = startTime.NextDay();
-                else
-                    closestNiceTime = startTime.Date + TimeSpan.FromHours(closestNiceHour);
-                if ((closestNiceTime - startTime).TotalHours < range.TotalHours * factor)
-                    startingTick = closestNiceTime;
-                else
-                    startingTick = startTime.Date + TimeSpan.FromHours(startTime.Hour + 1);
-                // Interval
-                int minutesToAdd = ((int)((range.TotalMinutes / 30.0) + 0.9)) * 30;
-                for (int i = 0; i < _niceHourIntervals.Length; i++)
+                for (int i = 1; i < niceHourNumbers.Length; i++)
                 {
-                    if (minutesToAdd / 60.0 <= _niceHourIntervals[i])
+                    if (startTime.Hour < niceHourNumbers[i])
                     {
-                        minutesToAdd = (int)(_niceHourIntervals[i] * 60);
+                        closestNiceHour = niceHourNumbers[i];
                         break;
                     }
                 }
+
+                DateTime closestNiceTime;
+                if (closestNiceHour == 0)
+                {
+                    closestNiceTime = startTime.NextDay();
+                }
+                else
+                {
+                    closestNiceTime = startTime.Date + TimeSpan.FromHours(closestNiceHour);
+                }
+
+                if ((closestNiceTime - startTime).TotalHours < range.TotalHours * factor)
+                {
+                    startingTick = closestNiceTime;
+                }
+                else
+                {
+                    startingTick = startTime.Date + TimeSpan.FromHours(startTime.Hour + 1);
+                }
+                
+                // Interval
+                int minutesToAdd = ((int)((range.TotalMinutes / 30.0) + 0.9)) * 30;
+                for (int i = 0; i < niceHourIntervals.Length; i++)
+                {
+                    if (minutesToAdd / 60.0 <= niceHourIntervals[i])
+                    {
+                        minutesToAdd = (int)(niceHourIntervals[i] * 60);
+                        break;
+                    }
+                }
+
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
                 while ((nextTick = nextTick + TimeSpan.FromMinutes(minutesToAdd)) < endTime)
+                {
                     values.Add(ToDouble(nextTick));
+                }
             }
             else if (range.TotalSeconds > 50)
             {
-
-                TimeSpan diff = startTime.GetToClosestNiceInterval(range, _niceMinuteNumbers, (st) => st.Minute, 60.0, factor);
-                startingTick = startTime + diff - TimeSpan.FromSeconds(startTime.Second + startTime.Millisecond / 1000);
+                TimeSpan diff = startTime.GetToClosestNiceInterval(range, niceMinuteNumbers, (st) => st.Minute, 60.0, factor);
+                startingTick = startTime + diff - TimeSpan.FromSeconds(startTime.Second + (startTime.Millisecond / 1000));
+                
                 // Interval
                 int secondsToAdd = ((int)((range.TotalSeconds / 30.0) + 1)) * 30;
-                for (int i = 0; i < _niceMinuteIntervals.Length; i++)
-                    if (secondsToAdd / 60 <= _niceMinuteIntervals[i])
+                for (int i = 0; i < niceMinuteIntervals.Length; i++)
+                {
+                    if (secondsToAdd / 60 <= niceMinuteIntervals[i])
                     {
-                        secondsToAdd = (int)(_niceMinuteIntervals[i] * 60);
+                        secondsToAdd = (int)(niceMinuteIntervals[i] * 60);
                         break;
                     }
+                }
+
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
                 while ((nextTick = nextTick + TimeSpan.FromSeconds(secondsToAdd)) < endTime)
+                {
                     values.Add(ToDouble(nextTick));
+                }
             }
             else if (range.TotalSeconds > 1)
             {
-
-                TimeSpan diffSec = startTime.GetToClosestNiceInterval(range, _niceSecondNumbers, (st) => st.Second, 1.0, factor);
+                TimeSpan diffSec = startTime.GetToClosestNiceInterval(range, niceSecondNumbers, (st) => st.Second, 1.0, factor);
                 startingTick = startTime + diffSec;
+                
                 // Interval
-                for (int i = 1; i < _niceSecondIntervals.Length; i++)
+                for (int i = 1; i < niceSecondIntervals.Length; i++)
                 {
-                    if (range.TotalSeconds <= _niceSecondIntervals[i])
+                    if (range.TotalSeconds <= niceSecondIntervals[i])
                     {
-                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                            _niceSecondIntervals[i - 1], _niceSecondIntervals[i], numLabels, 1));
+                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime, niceSecondIntervals[i - 1], niceSecondIntervals[i], numLabels, 1));
                         break;
                     }
                 }
+
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
-                var tsSec = ToTimeSpan(interval);
-                while ((nextTick = nextTick + tsSec) < endTime)
+                var sec = ToTimeSpan(interval);
+                while ((nextTick = nextTick + sec) < endTime)
+                {
                     values.Add(ToDouble(nextTick));
+                }
             }
             else
             {
-                TimeSpan diffMicrosec = startTime.GetToClosestNiceInterval(range, _niceMillisecondIntervals, (st) => st.Millisecond, 0.001, factor);
+                TimeSpan diffMicrosec = startTime.GetToClosestNiceInterval(range, niceMillisecondIntervals, (st) => st.Millisecond, 0.001, factor);
                 startingTick = startTime + diffMicrosec;
+                
                 // Interval
-                for (int i = 1; i < _niceMillisecondIntervals.Length; i++)
+                for (int i = 1; i < niceMillisecondIntervals.Length; i++)
                 {
-                    if (range.TotalMilliseconds <= _niceMillisecondIntervals[i])
+                    if (range.TotalMilliseconds <= niceMillisecondIntervals[i])
                     {
-                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime,
-                            _niceMillisecondIntervals[i - 1], _niceMillisecondIntervals[i], numLabels, 0.001));
+                        interval = ToDouble(DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime, niceMillisecondIntervals[i - 1], niceMillisecondIntervals[i], numLabels, 0.001));
                         break;
                     }
                 }
+
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
                 var diffMilSec = ToTimeSpan(interval);
                 while ((nextTick = nextTick + diffMilSec) < endTime)
+                {
                     values.Add(ToDouble(nextTick));
+                }
             }
 
             return values;

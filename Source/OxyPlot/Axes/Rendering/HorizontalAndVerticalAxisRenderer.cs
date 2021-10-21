@@ -336,6 +336,12 @@ namespace OxyPlot.Axes
             var majorTickSegments = new List<ScreenPoint>();
             this.GetTickPositions(axis, axis.TickStyle, axis.MajorTickSize, axis.Position, out a0, out a1);
 
+            if (axis is DateTimeAxis)
+            {
+                // Update the date/time format for the axis labels.
+                ((DateTimeAxis)axis).UpdateIntervalType(this.Plot.PlotArea);
+            }
+
             foreach (double value in this.MajorTickValues)
             {
                 if (value < actualMinimum - eps || value > actualMaximum + eps)
