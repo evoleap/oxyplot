@@ -120,6 +120,11 @@ namespace OxyPlot.Axes
         private List<double> majorTickValues;
 
         /// <summary>
+        /// Indicates if tick values have been created (used to get major/minor steps)
+        /// </summary>
+        private bool tickValuesCreated;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref = "DateTimeAxis" /> class.
         /// </summary>
         public DateTimeAxis()
@@ -389,7 +394,6 @@ namespace OxyPlot.Axes
         internal override void UpdateIntervals(OxyRect plotArea)
         {
             base.UpdateIntervals(plotArea);
-            this.ActualMinorStep = this.CalculateMinorInterval(this.ActualMajorStep);
             var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
             var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
             this.LandmarkBoundariesCrossed = LandmarkType.None;
@@ -438,8 +442,6 @@ namespace OxyPlot.Axes
                     break;
                 case DateTimeIntervalType.Weeks:
                     this.actualMinorIntervalType = DateTimeIntervalType.Days;
-                    this.ActualMajorStep = 7;
-                    this.ActualMinorStep = 1;
                     if (this.ActualStringFormat == null)
                     {
                         this.ActualStringFormat = "yyyy/ww";
@@ -487,6 +489,13 @@ namespace OxyPlot.Axes
                     break;
                 case DateTimeIntervalType.Auto:
                     break;
+            }
+
+            if (!this.tickValuesCreated)
+            {
+                // This will set the major and minor steps
+                this.CreateDateTimeTickValues(
+                    this.ActualMinimum, this.ActualMaximum, this.ActualMajorStep, this.actualIntervalType);
             }
         }
 
@@ -1008,6 +1017,7 @@ namespace OxyPlot.Axes
 
                 // Interval
                 int numMonthsToAdd = (int)(((range.TotalDays / AVERAGEDAYSPERYEAR) * 4) + 0.5) * 3;
+                this.ActualMajorStep = AVERAGEDAYSPERYEAR;
                 while ((nextTick = nextTick.AddMonths(numMonthsToAdd)) < endTime)
                 {
                     values.Add(ToDouble(nextTick));
@@ -1031,6 +1041,7 @@ namespace OxyPlot.Axes
 
                 double daysToAdd = monthIntTimesTwo / 2.0 * AVERAGEDAYSPERMONTH;
                 var days = TimeSpan.FromDays(daysToAdd);
+                this.ActualMajorStep = daysToAdd;
                 while (true)
                 {
                     nextTick = nextTick + days;
@@ -1078,6 +1089,7 @@ namespace OxyPlot.Axes
 
                 // Interval
                 var niceInterval = DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime, (int)range.TotalDays, (int)range.TotalDays + 1, numLabels, 86400);
+                this.ActualMajorStep = niceInterval.TotalDays;
                 while ((nextTick = nextTick + niceInterval) < endTime)
                 {
                     values.Add(ToDouble(nextTick));
@@ -1127,6 +1139,7 @@ namespace OxyPlot.Axes
                 }
 
                 nextTick = startingTick.Value;
+                this.ActualMajorStep = TimeSpan.FromMinutes(minutesToAdd).TotalDays;
                 values.Add(ToDouble(nextTick));
                 while ((nextTick = nextTick + TimeSpan.FromMinutes(minutesToAdd)) < endTime)
                 {
@@ -1151,6 +1164,7 @@ namespace OxyPlot.Axes
 
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
+                this.ActualMajorStep = TimeSpan.FromSeconds(secondsToAdd).TotalDays;
                 while ((nextTick = nextTick + TimeSpan.FromSeconds(secondsToAdd)) < endTime)
                 {
                     values.Add(ToDouble(nextTick));
@@ -1174,6 +1188,7 @@ namespace OxyPlot.Axes
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
                 var sec = ToTimeSpan(interval);
+                this.ActualMajorStep = sec.TotalDays;
                 while ((nextTick = nextTick + sec) < endTime)
                 {
                     values.Add(ToDouble(nextTick));
@@ -1197,11 +1212,15 @@ namespace OxyPlot.Axes
                 nextTick = startingTick.Value;
                 values.Add(ToDouble(nextTick));
                 var diffMilSec = ToTimeSpan(interval);
+                this.ActualMajorStep = diffMilSec.TotalDays;
                 while ((nextTick = nextTick + diffMilSec) < endTime)
                 {
                     values.Add(ToDouble(nextTick));
                 }
             }
+
+            this.ActualMinorStep = this.CalculateMinorInterval(this.ActualMajorStep);
+            this.tickValuesCreated = true;
 
             return values;
         }
