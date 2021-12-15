@@ -579,12 +579,6 @@ namespace OxyPlot.Axes
                     switch (this.actualIntervalType)
                     {
                         case DateTimeIntervalType.Months:
-                            if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
-                            {
-                                fmt = "MMM d\nyyyy";
-                            }
-
-                            break;
                         case DateTimeIntervalType.Days:
                             if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
                             {
@@ -1027,7 +1021,7 @@ namespace OxyPlot.Axes
 
                 interval = ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGEDAYSPERMONTH));
             }
-            else if (range.TotalDays > 28)
+            else if (range.TotalDays > 56)
             {
                 minorStepInDays = true;
                 // Pick the closest 1st of a month
