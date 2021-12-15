@@ -356,7 +356,7 @@ namespace OxyPlot.Axes
                 else
                 {
                     var current = min;
-                    var step = (i == majorTickValues.Count) ? this.ActualMinorStep : CalculateMinorInterval(max - min);
+                    var step = this.ActualMinorStep; // (i == majorTickValues.Count) ? this.ActualMinorStep : CalculateMinorInterval(max - min);
                     while ((current += step) < max)
                     {
                         minorTickValuesLocal.Add(current);
