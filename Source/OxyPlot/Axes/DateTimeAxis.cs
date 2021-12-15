@@ -995,8 +995,10 @@ namespace OxyPlot.Axes
             var range = ToTimeSpan(step);
             double interval = 1.0;
             DateTime nextTick;
+            bool minorStepInDays;
             if (range.TotalDays > 365)
             {
+                minorStepInDays = true;
                 // Pick the closest 1st of a nice month
                 for (int i = 0; i < niceMonthNumbers.Length; i++)
                 {
@@ -1027,6 +1029,7 @@ namespace OxyPlot.Axes
             }
             else if (range.TotalDays > 28)
             {
+                minorStepInDays = true;
                 // Pick the closest 1st of a month
                 startingTick = startTime.FirstOfFollowingMonth();
                 nextTick = startingTick.Value;
@@ -1073,6 +1076,7 @@ namespace OxyPlot.Axes
             }
             else if (range.TotalDays > 1)
             {
+                minorStepInDays = true;
                 var nextNiceDay = startTime.NextNiceDay(niceDayNumbers);
                 var timeToNextNiceDay = nextNiceDay - startTime;
                 if (timeToNextNiceDay.TotalDays < range.TotalDays * factor)
@@ -1097,6 +1101,7 @@ namespace OxyPlot.Axes
             }
             else if (range.TotalMinutes > 50)
             {
+                minorStepInDays = false;
                 // return next nice hour
                 var closestNiceHour = 0;
                 for (int i = 1; i < niceHourNumbers.Length; i++)
@@ -1148,6 +1153,7 @@ namespace OxyPlot.Axes
             }
             else if (range.TotalSeconds > 50)
             {
+                minorStepInDays = false;
                 TimeSpan diff = startTime.GetToClosestNiceInterval(range, niceMinuteNumbers, (st) => st.Minute, 60.0, factor);
                 startingTick = startTime + diff - TimeSpan.FromSeconds(startTime.Second + (startTime.Millisecond / 1000));
                 
@@ -1172,6 +1178,7 @@ namespace OxyPlot.Axes
             }
             else if (range.TotalSeconds > 1)
             {
+                minorStepInDays = false;
                 TimeSpan diffSec = startTime.GetToClosestNiceInterval(range, niceSecondNumbers, (st) => st.Second, 1.0, factor);
                 startingTick = startTime + diffSec;
                 
@@ -1196,6 +1203,7 @@ namespace OxyPlot.Axes
             }
             else
             {
+                minorStepInDays = false;
                 TimeSpan diffMicrosec = startTime.GetToClosestNiceInterval(range, niceMillisecondIntervals, (st) => st.Millisecond, 0.001, factor);
                 startingTick = startTime + diffMicrosec;
                 
@@ -1220,6 +1228,14 @@ namespace OxyPlot.Axes
             }
 
             this.ActualMinorStep = this.CalculateMinorInterval(this.ActualMajorStep);
+            if (minorStepInDays)
+            {
+                double minorWholeStep = Math.Round(this.ActualMinorStep);
+                if (minorWholeStep > 0)
+                {
+                    this.ActualMinorStep = minorWholeStep;
+                }
+            }
             this.tickValuesCreated = true;
 
             return values;
