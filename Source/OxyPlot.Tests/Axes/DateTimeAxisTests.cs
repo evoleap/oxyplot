@@ -118,5 +118,34 @@ namespace OxyPlot.Tests
             axis.GetTickValues(out majorLabelValues, out majorTickValues, out minorTickValues);
             Assert.AreEqual(8, majorLabelValues.Count);
         }
+
+        [Test]
+        public void GetSetLabelsTickValues()
+        {
+            var rc = Substitute.For<IRenderContext>();
+            var plot = new PlotModel { Title = "Backgrounds" };
+            ((IPlotModel)plot).Render(rc, 500, 500);
+
+            DateTimeAxis axis = new DateTimeAxis();
+
+            axis.Minimum = 44468.85;
+            axis.Maximum = 44476.76;
+            axis.NumberOfLabels = 20;
+            axis.Reset();
+            plot.Axes.Add(axis);
+            ((IPlotModel)plot).Render(rc, 500, 500);
+
+            // The code will call render in a loop, so this simulates that.
+            axis.Render(rc, plot, AxisLayer.BelowSeries, 0);
+            axis.Render(rc, plot, AxisLayer.BelowSeries, 1);
+            axis.Render(rc, plot, AxisLayer.BelowSeries, 2);
+
+            IList<double> majorLabelValues;
+            IList<double> majorTickValues;
+            IList<double> minorTickValues;
+
+            axis.GetTickValues(out majorLabelValues, out majorTickValues, out minorTickValues);
+            Assert.AreEqual(16, majorLabelValues.Count);
+        }
     }
 }
