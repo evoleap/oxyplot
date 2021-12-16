@@ -121,6 +121,17 @@ namespace OxyPlot.Utilities
         }
 
         /// <summary>
+        /// Get the number of days in the date's month
+        /// </summary>
+        /// <param name="date">The date with the month to check</param>
+        /// <returns>Number of days in month</returns>
+        public static int NumberOfDaysInMonth(this DateTime date)
+        {
+            DateTime lastDayOfMonth = date.FirstOfFollowingMonth().Subtract(TimeSpan.FromDays(1));
+            return lastDayOfMonth.Day;
+        }
+
+        /// <summary>
         /// Get the first of the following year
         /// </summary>
         /// <param name="startTime">The date time with this year</param>
