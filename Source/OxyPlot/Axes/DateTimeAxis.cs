@@ -1088,7 +1088,18 @@ namespace OxyPlot.Axes
                 values.Add(ToDouble(nextTick));
 
                 // Interval
-                var niceInterval = DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime, (int)range.TotalDays, (int)range.TotalDays + 1, numLabels, 86400);
+                int idealLabels = 0;
+                if (this.PlotModel.Width > 0 && this.IntervalLength > 0)
+                {
+                    idealLabels = (int)(this.PlotModel.Width / this.IntervalLength);
+                }
+
+                if (idealLabels == 0)
+                {
+                    idealLabels = 4;
+                }
+
+                var niceInterval = DateTimeAxisUtilities.PickNiceInterval(startingTick.Value, endTime, (int)range.TotalDays, (int)range.TotalDays + 1, idealLabels, 86400);
                 this.ActualMajorStep = niceInterval.TotalDays;
                 while ((nextTick = nextTick + niceInterval) < endTime)
                 {
