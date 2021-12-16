@@ -238,6 +238,11 @@ namespace OxyPlot.Axes
         public DateTimeIntervalType MinorIntervalType { get; set; }
 
         /// <summary>
+        /// Gets or sets the number of labels to display on the axis
+        /// </summary>
+        public int NumberOfLabels { get; set; }
+
+        /// <summary>
         /// Gets or sets the time zone (used when formatting date/time values).
         /// </summary>
         /// <value>The time zone info.</value>
@@ -339,7 +344,7 @@ namespace OxyPlot.Axes
             out IList<double> majorLabelValues, out IList<double> majorTickValues, out IList<double> minorTickValues)
         {
             majorTickValues = this.CreateDateTimeTickValues(
-                this.ActualMinimum, this.ActualMaximum, this.ActualMajorStep, this.actualIntervalType);
+                this.ActualMinimum, this.ActualMaximum, this.actualIntervalType);
             var minorTickValuesLocal = new List<double>();
             for (int i = 0; i <= majorTickValues.Count; i++)
             {
@@ -356,7 +361,7 @@ namespace OxyPlot.Axes
                 else
                 {
                     var current = min;
-                    var step = (i == majorTickValues.Count) ? this.ActualMinorStep : CalculateMinorInterval(max - min);
+                    var step = this.ActualMinorStep; // (i == majorTickValues.Count) ? this.ActualMinorStep : CalculateMinorInterval(max - min);
                     while ((current += step) < max)
                     {
                         minorTickValuesLocal.Add(current);
@@ -495,7 +500,7 @@ namespace OxyPlot.Axes
             {
                 // This will set the major and minor steps
                 this.CreateDateTimeTickValues(
-                    this.ActualMinimum, this.ActualMaximum, this.ActualMajorStep, this.actualIntervalType);
+                    this.ActualMinimum, this.ActualMaximum, this.actualIntervalType);
             }
         }
 
@@ -579,12 +584,6 @@ namespace OxyPlot.Axes
                     switch (this.actualIntervalType)
                     {
                         case DateTimeIntervalType.Months:
-                            if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
-                            {
-                                fmt = "MMM d\nyyyy";
-                            }
-
-                            break;
                         case DateTimeIntervalType.Days:
                             if (landmarkCrossingType == LandmarkType.Year || (landmarkCrossingType == LandmarkType.None && (this.LandmarkBoundariesCrossed & LandmarkType.Year) > 0))
                             {
@@ -720,7 +719,8 @@ namespace OxyPlot.Axes
         protected override double CalculateActualInterval(double availableSize, double maxIntervalSize)
         {
             double factor = 0.5;
-            int numLabels = (int)(availableSize / maxIntervalSize);
+            double step;
+            int numLabels = this.GetNumLabels(availableSize, maxIntervalSize, Math.Abs(this.ActualMaximum - this.ActualMinimum), out step);
             double rangeDbl = Math.Abs(this.ActualMinimum - this.ActualMaximum) / numLabels;
             var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
             var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
@@ -979,16 +979,25 @@ namespace OxyPlot.Axes
         /// </summary>
         /// <param name="min">The min.</param>
         /// <param name="max">The max.</param>
-        /// <param name="step">The step.</param>
         /// <param name="intervalType">Type of the interval.</param>
         /// <returns>Date tick values.</returns>
         private IList<double> CreateDateTickValues(
-            double min, double max, double step, DateTimeIntervalType intervalType)
+            double min, double max, DateTimeIntervalType intervalType)
         {
+            double step;
             var values = new Collection<double>();
             double factor = 1.0;
-            int numLabels = (int)((max - min) / step);
-            double rangeDouble = Math.Abs(max - min) / numLabels;
+            int numLabels;
+            if (this.PlotModel != null)
+            {
+                numLabels = this.GetNumLabels(this.PlotModel.Width, this.IntervalLength, Math.Abs(max - min), out step);
+            }
+            else
+            {
+                step = this.ActualMajorStep;
+                numLabels = (int)Math.Abs((max - min) / step);
+            }
+
             var startTime = ToDateTime(Math.Min(min, max));
             var endTime = ToDateTime(Math.Max(min, max));
             DateTime? startingTick = null;
@@ -1025,7 +1034,7 @@ namespace OxyPlot.Axes
 
                 interval = ToDouble(TimeSpan.FromDays(numMonthsToAdd * AVERAGEDAYSPERMONTH));
             }
-            else if (range.TotalDays > 28)
+            else if (range.TotalDays > 56)
             {
                 // Pick the closest 1st of a month
                 startingTick = startTime.FirstOfFollowingMonth();
@@ -1226,17 +1235,48 @@ namespace OxyPlot.Axes
         }
 
         /// <summary>
+        /// Get the number of labels to render
+        /// </summary>
+        /// <param name="availableSize">The available size for rendering labels</param>
+        /// <param name="maxIntervalSize">The ideal size of the label</param>
+        /// <param name="sizeUnits">The size of the axis in units</param>
+        /// <param name="step">Will output the step size as a double</param>
+        /// <returns>The number of labels to render</returns>
+        private int GetNumLabels(double availableSize, double maxIntervalSize, double sizeUnits, out double step)
+        {
+            int ret = 0;
+            step = this.ActualMajorStep;
+
+            if (this.NumberOfLabels > 0)
+            {
+                ret = this.NumberOfLabels;
+                step = sizeUnits / ((double)this.NumberOfLabels);
+            }
+            else if (maxIntervalSize != 0)
+            {
+                ret = (int)(availableSize / maxIntervalSize);
+            }
+
+            if (ret <= 0)
+            {
+                ret = 4; // sane default
+                step = sizeUnits / 4;
+            }
+
+            return ret;
+        }
+
+        /// <summary>
         /// Creates <see cref="DateTime" /> tick values.
         /// </summary>
         /// <param name="min">The min.</param>
         /// <param name="max">The max.</param>
-        /// <param name="interval">The interval.</param>
         /// <param name="intervalType">The interval type.</param>
         /// <returns>A list of <see cref="DateTime" /> tick values.</returns>
         private IList<double> CreateDateTimeTickValues(
-            double min, double max, double interval, DateTimeIntervalType intervalType)
+            double min, double max, DateTimeIntervalType intervalType)
         {
-            return this.CreateDateTickValues(min, max, interval, intervalType);
+            return this.CreateDateTickValues(min, max, intervalType);
         }
 
         /// <summary>
