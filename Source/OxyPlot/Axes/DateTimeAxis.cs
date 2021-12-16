@@ -719,7 +719,8 @@ namespace OxyPlot.Axes
         protected override double CalculateActualInterval(double availableSize, double maxIntervalSize)
         {
             double factor = 0.5;
-            int numLabels = this.GetNumLabels(availableSize, maxIntervalSize, Math.Abs(this.ActualMaximum - this.ActualMinimum), out _);
+            double step;
+            int numLabels = this.GetNumLabels(availableSize, maxIntervalSize, Math.Abs(this.ActualMaximum - this.ActualMinimum), out step);
             double rangeDbl = Math.Abs(this.ActualMinimum - this.ActualMaximum) / numLabels;
             var startTime = ToDateTime(Math.Min(this.ActualMinimum, this.ActualMaximum));
             var endTime = ToDateTime(Math.Max(this.ActualMinimum, this.ActualMaximum));
