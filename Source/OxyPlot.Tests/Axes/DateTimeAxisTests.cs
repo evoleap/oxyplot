@@ -133,7 +133,7 @@ namespace OxyPlot.Tests
             axis.NumberOfLabels = 20;
             axis.Reset();
             plot.Axes.Add(axis);
-            ((IPlotModel)plot).Render(rc, 500, 500);
+            ((IPlotModel)plot).Render(rc, 1000, 1000);
 
             // The code will call render in a loop, so this simulates that.
             axis.Render(rc, plot, AxisLayer.BelowSeries, 0);
