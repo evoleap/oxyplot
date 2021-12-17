@@ -988,9 +988,10 @@ namespace OxyPlot.Axes
             var values = new Collection<double>();
             double factor = 1.0;
             int numLabels;
-            if (this.PlotModel != null)
+            if (this.PlotModel?.PlotArea != null)
             {
-                numLabels = this.GetNumLabels(this.PlotModel.Width, this.IntervalLength, Math.Abs(max - min), out step);
+                double length = this.IsHorizontal() ? PlotModel.PlotArea.Width : PlotModel.PlotArea.Height;
+                numLabels = this.GetNumLabels(length, this.IntervalLength, Math.Abs(max - min), out step);
             }
             else
             {

@@ -108,7 +108,7 @@ namespace OxyPlot.Tests
             axis.Maximum = 44476.76;
             axis.Reset();
             axis.MajorStep = 1.01;
-            ((IPlotModel)plot).Render(rc, 500, 500);
+            ((IPlotModel)plot).Render(rc, 600, 600);
 
             // The code will call render in a loop, so this simulates that.
             axis.Render(rc, plot, AxisLayer.BelowSeries, 0);
