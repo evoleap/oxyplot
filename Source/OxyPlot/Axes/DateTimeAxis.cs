@@ -133,6 +133,7 @@ namespace OxyPlot.Axes
             this.IntervalType = DateTimeIntervalType.Auto;
             this.FirstDayOfWeek = DayOfWeek.Monday;
             this.CalendarWeekRule = CalendarWeekRule.FirstFourDayWeek;
+            this.IntervalLength = 90;
         }
 
         /// <summary>
@@ -155,6 +156,7 @@ namespace OxyPlot.Axes
 
             this.StringFormat = format;
             this.IntervalType = intervalType;
+            this.IntervalLength = 90;
         }
 
         /// <summary>
@@ -711,7 +713,7 @@ namespace OxyPlot.Axes
         }
 
         /// <summary>
-        /// Calculates the actual interval.
+        /// Calculates the actual interval (actual major step).
         /// </summary>
         /// <param name="availableSize">Size of the available area.</param>
         /// <param name="maxIntervalSize">Maximum length of the intervals.</param>
@@ -999,6 +1001,12 @@ namespace OxyPlot.Axes
                 numLabels = (int)Math.Abs((max - min) / step);
             }
 
+            if (intervalType == DateTimeIntervalType.Milliseconds && this.NumberOfLabels == 0)
+            {
+                // Milliseconds are very wide, so give more room.
+                step *= 1.2;
+            }
+
             var startTime = ToDateTime(Math.Min(min, max));
             var endTime = ToDateTime(Math.Max(min, max));
             DateTime? startingTick = null;
@@ -1027,7 +1035,7 @@ namespace OxyPlot.Axes
 
                 // Interval
                 int numMonthsToAdd = (int)(((range.TotalDays / AVERAGEDAYSPERYEAR) * 4) + 0.5) * 3;
-                this.ActualMajorStep = AVERAGEDAYSPERYEAR;
+                this.ActualMajorStep = numMonthsToAdd * AVERAGEDAYSPERMONTH;
                 while ((nextTick = nextTick.AddMonths(numMonthsToAdd)) < endTime)
                 {
                     values.Add(ToDouble(nextTick));
@@ -1250,8 +1258,15 @@ namespace OxyPlot.Axes
 
             if (this.NumberOfLabels > 0)
             {
+                // Max labels with tight fit or some overlap
+                int maxLabels = (int)(availableSize / 60);
                 ret = this.NumberOfLabels;
-                step = sizeUnits / ((double)this.NumberOfLabels);
+                if (ret > maxLabels)
+                {
+                    ret = maxLabels;
+                }
+
+                step = sizeUnits / ((double)ret);
             }
             else if (maxIntervalSize != 0)
             {

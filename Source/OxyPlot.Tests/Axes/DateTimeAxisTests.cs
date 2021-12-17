@@ -87,7 +87,7 @@ namespace OxyPlot.Tests
             IList<double> majorTickValues;
             IList<double> minorTickValues;
             axis.GetTickValues(out majorLabelValues, out majorTickValues, out minorTickValues);
-            Assert.AreEqual(7, majorLabelValues.Count);
+            Assert.AreEqual(5, majorLabelValues.Count);
 
             Action<LineSeries> addExamplePoints = ls =>
             {
@@ -108,7 +108,7 @@ namespace OxyPlot.Tests
             axis.Maximum = 44476.76;
             axis.Reset();
             axis.MajorStep = 1.01;
-            ((IPlotModel)plot).Render(rc, 600, 600);
+            ((IPlotModel)plot).Render(rc, 800, 800);
 
             // The code will call render in a loop, so this simulates that.
             axis.Render(rc, plot, AxisLayer.BelowSeries, 0);
