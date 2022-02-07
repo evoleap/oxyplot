@@ -196,6 +196,45 @@ namespace OxyPlot.Tests
         }
 
         [Test]
+        public void A17_AxisWithHiddenLabels()
+        {
+            var plot = new PlotModel { Title = "Axis with Hidden Labels" };
+
+            plot.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Title = "X-axis", IsTitleAndLabelsVisible = false });
+            plot.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title = "Y-axis", IsTitleAndLabelsVisible = false });
+
+            var ls = new LineSeries();
+            ls.Points.Add(new DataPoint(3, 13));
+            ls.Points.Add(new DataPoint(10, 47));
+            ls.Points.Add(new DataPoint(30, 23));
+            ls.Points.Add(new DataPoint(40, 65));
+            ls.Points.Add(new DataPoint(80, 10));
+            plot.Series.Add(ls);
+
+            OxyAssert.AreEqual(plot, "A17");
+        }
+
+        [Test]
+        public void A18_AxisWithHiddenLabelsGridlines()
+        {
+            var plot = new PlotModel { Title = "Axis with Hidden Labels & Gridlines" };
+
+            plot.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Title = "X-axis", IsTitleAndLabelsVisible = false, TickStyle = TickStyle.None, MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Solid });
+            plot.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title = "Y-axis", IsTitleAndLabelsVisible = false, TickStyle = TickStyle.None, MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Solid });
+
+            var ls = new LineSeries();
+            ls.Points.Add(new DataPoint(3, 13));
+            ls.Points.Add(new DataPoint(10, 47));
+            ls.Points.Add(new DataPoint(30, 23));
+            ls.Points.Add(new DataPoint(40, 65));
+            ls.Points.Add(new DataPoint(80, 10));
+            plot.Series.Add(ls);
+
+            OxyAssert.AreEqual(plot, "A18");
+        }
+
+
+        [Test]
         public void B01_LogarithmicAxis()
         {
             var plot = new PlotModel { Title = "Logarithmic axis" };

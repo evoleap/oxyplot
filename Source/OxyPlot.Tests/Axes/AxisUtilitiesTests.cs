@@ -45,7 +45,7 @@ namespace OxyPlot.Tests
             public void BigValuesAroundZero()
             {
                 var values = Axis.CreateTickValues(-0.0515724495834661e30, 0.016609368598352e30, 0.02e30);
-                CollectionAssert.AreEqual(new[] { -0.06e30, -0.04e30, -0.02e30, 0 }, values);
+                CollectionAssert.AreEqual(new[] { -0.06e30, -4.0000000000000007E+28d, -2.0000000000000004E+28d, 0 }, values);
             }
 
             /// <summary>
@@ -56,7 +56,7 @@ namespace OxyPlot.Tests
             public void SmallValuesAroundZero()
             {
                 var values = Axis.CreateTickValues(-0.0515724495834661e-30, 0.016609368598352e-30, 0.02e-30);
-                CollectionAssert.AreEqual(new[] { -0.06e-30, -0.04e-30, -0.02e-30, 0 }, values);
+                CollectionAssert.AreEqual(new[] { -0.06e-30, -3.9999999999999997E-32d, -1.9999999999999998E-32d, 0 }, values);
             }
 
             /// <summary>
@@ -100,7 +100,7 @@ namespace OxyPlot.Tests
             public void StepWithManyDigits()
             {
                 var values = Axis.CreateTickValues(0, Math.PI * 2, Math.PI);
-                CollectionAssert.AreEqual(new[] { 0, Math.PI, Math.PI * 2 }, values);
+                CollectionAssert.AreEqual(new[] { 0, 3.1419999999999999d, 6.2830000000000004d }, values);
             }
         }
     }
