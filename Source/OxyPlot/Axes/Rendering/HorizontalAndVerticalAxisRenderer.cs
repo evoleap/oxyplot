@@ -140,7 +140,10 @@ namespace OxyPlot.Axes
             if (pass == 1)
             {
                 this.RenderMajorItems(axis, axisPosition, titlePosition, drawAxisLine);
-                this.RenderAxisTitle(axis, titlePosition);
+                if (axis.IsTitleAndLabelsVisible)
+                {
+                    this.RenderAxisTitle(axis, titlePosition);
+                }
             }
         }
 
@@ -395,85 +398,88 @@ namespace OxyPlot.Axes
                 }
             }
 
-            // Render the axis labels (numbers or category names)
-            foreach (double value in this.MajorLabelValues)
+            if (axis.IsTitleAndLabelsVisible)
             {
-                if (value < actualMinimum - eps || value > actualMaximum + eps)
+                // Render the axis labels (numbers or category names)
+                foreach (double value in this.MajorLabelValues)
                 {
-                    continue;
-                }
+                    if (value < actualMinimum - eps || value > actualMaximum + eps)
+                    {
+                        continue;
+                    }
 
-                if (axis.PositionAtZeroCrossing && Math.Abs(value) < eps)
-                {
-                    continue;
-                }
+                    if (axis.PositionAtZeroCrossing && Math.Abs(value) < eps)
+                    {
+                        continue;
+                    }
 
-                double transformedValue = axis.Transform(value);
-                if (isHorizontal)
-                {
-                    SnapTo(plotAreaLeft, ref transformedValue);
-                    SnapTo(plotAreaRight, ref transformedValue);
-                }
-                else
-                {
-                    SnapTo(plotAreaTop, ref transformedValue);
-                    SnapTo(plotAreaBottom, ref transformedValue);
-                }
+                    double transformedValue = axis.Transform(value);
+                    if (isHorizontal)
+                    {
+                        SnapTo(plotAreaLeft, ref transformedValue);
+                        SnapTo(plotAreaRight, ref transformedValue);
+                    }
+                    else
+                    {
+                        SnapTo(plotAreaTop, ref transformedValue);
+                        SnapTo(plotAreaBottom, ref transformedValue);
+                    }
 
-                var pt = new ScreenPoint();
-                var ha = HorizontalAlignment.Right;
-                var va = VerticalAlignment.Middle;
-                switch (axis.Position)
-                {
-                    case AxisPosition.Left:
-                        pt = new ScreenPoint(axisPosition + a1 - axis.AxisTickToLabelDistance, transformedValue);
-                        this.GetRotatedAlignments(
-                            axis.Angle,
-                            HorizontalAlignment.Right,
-                            VerticalAlignment.Middle,
-                            out ha,
-                            out va);
-                        break;
-                    case AxisPosition.Right:
-                        pt = new ScreenPoint(axisPosition + a1 + axis.AxisTickToLabelDistance, transformedValue);
-                        this.GetRotatedAlignments(
-                            axis.Angle,
-                            HorizontalAlignment.Left,
-                            VerticalAlignment.Middle,
-                            out ha,
-                            out va);
-                        break;
-                    case AxisPosition.Top:
-                        pt = new ScreenPoint(transformedValue, axisPosition + a1 - axis.AxisTickToLabelDistance);
-                        this.GetRotatedAlignments(
-                            axis.Angle,
-                            HorizontalAlignment.Center,
-                            VerticalAlignment.Bottom,
-                            out ha,
-                            out va);
-                        break;
-                    case AxisPosition.Bottom:
-                        pt = new ScreenPoint(transformedValue, axisPosition + a1 + axis.AxisTickToLabelDistance);
-                        this.GetRotatedAlignments(
-                            axis.Angle,
-                            HorizontalAlignment.Center,
-                            VerticalAlignment.Top,
-                            out ha,
-                            out va);
-                        break;
-                }
+                    var pt = new ScreenPoint();
+                    var ha = HorizontalAlignment.Right;
+                    var va = VerticalAlignment.Middle;
+                    switch (axis.Position)
+                    {
+                        case AxisPosition.Left:
+                            pt = new ScreenPoint(axisPosition + a1 - axis.AxisTickToLabelDistance, transformedValue);
+                            this.GetRotatedAlignments(
+                                axis.Angle,
+                                HorizontalAlignment.Right,
+                                VerticalAlignment.Middle,
+                                out ha,
+                                out va);
+                            break;
+                        case AxisPosition.Right:
+                            pt = new ScreenPoint(axisPosition + a1 + axis.AxisTickToLabelDistance, transformedValue);
+                            this.GetRotatedAlignments(
+                                axis.Angle,
+                                HorizontalAlignment.Left,
+                                VerticalAlignment.Middle,
+                                out ha,
+                                out va);
+                            break;
+                        case AxisPosition.Top:
+                            pt = new ScreenPoint(transformedValue, axisPosition + a1 - axis.AxisTickToLabelDistance);
+                            this.GetRotatedAlignments(
+                                axis.Angle,
+                                HorizontalAlignment.Center,
+                                VerticalAlignment.Bottom,
+                                out ha,
+                                out va);
+                            break;
+                        case AxisPosition.Bottom:
+                            pt = new ScreenPoint(transformedValue, axisPosition + a1 + axis.AxisTickToLabelDistance);
+                            this.GetRotatedAlignments(
+                                axis.Angle,
+                                HorizontalAlignment.Center,
+                                VerticalAlignment.Top,
+                                out ha,
+                                out va);
+                            break;
+                    }
 
-                string text = axis.FormatValue(value);
-                this.RenderContext.DrawMathText(
-                    pt,
-                    text,
-                    axis.ActualTextColor,
-                    axis.ActualFont,
-                    axis.ActualFontSize,
-                    axis.ActualFontWeight,
-                    axis.Angle,
-                    ha,
-                    va);
+                    string text = axis.FormatValue(value);
+                    this.RenderContext.DrawMathText(
+                        pt,
+                        text,
+                        axis.ActualTextColor,
+                        axis.ActualFont,
+                        axis.ActualFontSize,
+                        axis.ActualFontWeight,
+                        axis.Angle,
+                        ha,
+                        va);
+                }
             }
 
             // Draw the zero crossing line

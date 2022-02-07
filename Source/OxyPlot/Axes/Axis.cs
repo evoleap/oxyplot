@@ -52,6 +52,7 @@ namespace OxyPlot.Axes
             this.Position = AxisPosition.Left;
             this.PositionTier = 0;
             this.IsAxisVisible = true;
+            this.IsTitleAndLabelsVisible = true;
             this.Layer = AxisLayer.BelowSeries;
 
             this.ViewMaximum = double.NaN;
@@ -287,6 +288,11 @@ namespace OxyPlot.Axes
         /// Gets or sets a value indicating whether this axis is visible. The default value is <c>true</c>.
         /// </summary>
         public bool IsAxisVisible { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the axis title and labels are visible. The default value is <c>true</c>.
+        /// </summary>
+        public bool IsTitleAndLabelsVisible { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether panning is enabled. The default value is <c>true</c>.
@@ -880,30 +886,25 @@ namespace OxyPlot.Axes
         /// <returns>The size of the axis.</returns>
         public virtual OxySize Measure(IRenderContext rc)
         {
-            IList<double> majorTickValues;
-            IList<double> minorTickValues;
-            IList<double> majorLabelValues;
-
-            this.GetTickValues(out majorLabelValues, out majorTickValues, out minorTickValues);
-
             var maximumTextSize = new OxySize();
-            foreach (double v in majorLabelValues)
+            OxySize labelTextSize;
+
+            if (this.IsTitleAndLabelsVisible)
             {
-                string s = this.FormatValue(v);
-                var size = rc.MeasureText(s, this.ActualFont, this.ActualFontSize, this.ActualFontWeight);
-                if (size.Width > maximumTextSize.Width)
-                {
-                    maximumTextSize.Width = size.Width;
-                }
+                IList<double> majorTickValues;
+                IList<double> minorTickValues;
+                IList<double> majorLabelValues;
+                this.GetTickValues(out majorLabelValues, out majorTickValues, out minorTickValues);
 
-                if (size.Height > maximumTextSize.Height)
-                {
-                    maximumTextSize.Height = size.Height;
-                }
+                this.GetMaxLabelSize(rc, ref maximumTextSize, majorLabelValues);
+
+                labelTextSize = rc.MeasureText(
+                    this.ActualTitle, this.ActualFont, this.ActualFontSize, this.ActualFontWeight);
             }
-
-            var labelTextSize = rc.MeasureText(
-                this.ActualTitle, this.ActualFont, this.ActualFontSize, this.ActualFontWeight);
+            else
+            {
+                labelTextSize = new OxySize();
+            }
 
             double width = 0;
             double height = 0;
@@ -1601,6 +1602,30 @@ namespace OxyPlot.Axes
             if (handler != null)
             {
                 handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Get the maximum label size for all the major labels.
+        /// </summary>
+        /// <param name="rc">The render context</param>
+        /// <param name="maximumTextSize">An initialized <see cref="OxySize"/> object</param>
+        /// <param name="majorLabelValues">The list of major label values</param>
+        private void GetMaxLabelSize(IRenderContext rc, ref OxySize maximumTextSize, IList<double> majorLabelValues)
+        {
+            foreach (double v in majorLabelValues)
+            {
+                string s = this.FormatValue(v);
+                var size = rc.MeasureText(s, this.ActualFont, this.ActualFontSize, this.ActualFontWeight);
+                if (size.Width > maximumTextSize.Width)
+                {
+                    maximumTextSize.Width = size.Width;
+                }
+
+                if (size.Height > maximumTextSize.Height)
+                {
+                    maximumTextSize.Height = size.Height;
+                }
             }
         }
     }
