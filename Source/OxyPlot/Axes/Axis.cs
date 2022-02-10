@@ -566,6 +566,11 @@ namespace OxyPlot.Axes
         public bool UseSuperExponentialFormat { get; set; }
 
         /// <summary>
+        /// Gets the size of the position tier (internally set).
+        /// </summary>
+        public double PositionTierSize { get; internal set; }
+
+        /// <summary>
         /// Gets or sets the position tier max shift.
         /// </summary>
         internal double PositionTierMaxShift { get; set; }
@@ -574,11 +579,6 @@ namespace OxyPlot.Axes
         /// Gets or sets the position tier min shift.
         /// </summary>
         internal double PositionTierMinShift { get; set; }
-
-        /// <summary>
-        /// Gets or sets the size of the position tier.
-        /// </summary>
-        internal double PositionTierSize { get; set; }
 
         /// <summary>
         /// Gets the actual color of the title.
