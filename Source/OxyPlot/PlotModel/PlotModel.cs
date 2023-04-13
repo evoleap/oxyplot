@@ -634,7 +634,8 @@ namespace OxyPlot
         public bool DisplayCustomLegend { get; set; }
 
         /// <summary>
-        /// If DisplayCustomLegend is <c>true</c>, then the legend will be based on these series rather than on a Series property.
+        /// Gets the custom series. If DisplayCustomLegend is <c>true</c>, then the legend will be based on these 
+        /// series rather than on a Series property.
         /// </summary>
         public ElementCollection<Series.Series> CustomSeries { get; private set; }
 

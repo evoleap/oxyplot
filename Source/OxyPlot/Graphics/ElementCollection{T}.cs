@@ -196,7 +196,7 @@ namespace OxyPlot
         }
 
         /// <summary>
-        /// Specifies whether a series is used to display the custom legend.
+        /// Gets or sets a value indicating whether a series is used to display the custom legend.
         /// </summary>
         public bool IsCustomLegendSeries { get; set; }
     }
