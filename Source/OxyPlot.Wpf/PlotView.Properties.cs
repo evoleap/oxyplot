@@ -252,8 +252,8 @@ namespace OxyPlot.Wpf
             typeof(PlotView),
             new PropertyMetadata(
                 new[] 
-            {  
-                Color.FromRgb(0x4E, 0x9A, 0x06),
+                {  
+                    Color.FromRgb(0x4E, 0x9A, 0x06),
                     Color.FromRgb(0xC8, 0x8D, 0x00),
                     Color.FromRgb(0xCC, 0x00, 0x00),
                     Color.FromRgb(0x20, 0x4A, 0x87),
@@ -264,8 +264,8 @@ namespace OxyPlot.Wpf
                     Colors.Blue,
                     Colors.Indigo,
                     Colors.Violet
-            },
-                    AppearanceChanged));
+                },
+                AppearanceChanged));
 
         /// <summary>
         /// Identifies the <see cref="AxisTierDistance"/> dependency property.

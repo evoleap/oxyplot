@@ -40,6 +40,7 @@ namespace OxyPlot
             return type.GetRuntimeFields();
         }
 #endif
+
         /// <summary>
         /// Fills a target by the specified property of a source target/enumerable.
         /// </summary>

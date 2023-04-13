@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PolyLineAnnotation.cs" company="OxyPlot">
+// <copyright file="PolylineAnnotation.cs" company="OxyPlot">
 //   Copyright (c) 2014 OxyPlot contributors
 // </copyright>
 // <summary>

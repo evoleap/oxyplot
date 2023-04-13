@@ -19,7 +19,6 @@
   </metadata>
   <files>
     <file src="..\..\Output\NET45\OxyPlot.Pdf.???" target="lib\net45" />
-    <file src="..\..\Output\NET40\OxyPlot.Pdf.???" target="lib\net40" />
     <file src="..\..\Output\SL5\OxyPlot.Pdf.???" target="lib\sl5" />
     <file src="..\..\Output\SL5\silverPDF.*" target="lib\sl5" />
     <file src="..\..\README.md" />

@@ -17,6 +17,16 @@
     <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
     <TargetFrameworkProfile />
   </PropertyGroup>
+  <PropertyGroup>
+    <!--
+    Make sure any documentation comments which are included in code get checked for syntax during the build, but do
+    not report warnings for missing comments.
+
+    CS1573: Parameter 'parameter' has no matching param tag in the XML comment for 'parameter' (but other parameters do)
+    CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member'
+    -->
+    <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -25,6 +35,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\Output\NET45\OxyPlot.Wpf.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -80,6 +91,7 @@
     <Compile Include="Axes\LogarithmicAxis.cs" />
     <Compile Include="Converters\ThicknessConverter.cs" />
     <Compile Include="Converters\OxyColorConverter.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="PlotCommands.cs" />
     <Compile Include="PlotView.cs" />
     <Compile Include="PlotView.Properties.cs" />
@@ -112,6 +124,7 @@
     <Compile Include="Tracker\TrackerControl.cs" />
     <Compile Include="Tracker\TrackerDefinition.cs" />
     <None Include="OxyPlot.Wpf.snk" />
+    <None Include="packages.config" />
     <None Include="RenderContexts\GeometryRenderContext.cs" />
     <None Include="RenderContexts\DrawingRenderContext.cs" />
     <None Include="PlotFrame.cs" />
@@ -158,8 +171,11 @@
       <Name>OxyPlot</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\StyleCop.Analyzers.Unstable.1.2.0.435\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.Unstable.1.2.0.435\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(ProjectDir)\..\StyleCop.targets" Condition=" '$(OS)' == 'Windows_NT' " />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
