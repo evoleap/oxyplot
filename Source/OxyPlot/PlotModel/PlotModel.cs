@@ -218,6 +218,8 @@ namespace OxyPlot
         {
             this.Axes = new ElementCollection<Axis>(this);
             this.Series = new ElementCollection<Series.Series>(this);
+            this.CustomSeries = new ElementCollection<Series.Series>(this);
+            this.CustomSeries.IsCustomLegendSeries = true;
             this.Annotations = new ElementCollection<Annotation>(this);
 
             this.PlotType = PlotType.XY;
@@ -624,6 +626,18 @@ namespace OxyPlot
         /// </summary>
         /// <value>The series.</value>
         public ElementCollection<Series.Series> Series { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to display legend based on a CustomSeries property, rather than on
+        /// a Series property.
+        /// </summary>
+        public bool DisplayCustomLegend { get; set; }
+
+        /// <summary>
+        /// Gets the custom series. If DisplayCustomLegend is <c>true</c>, then the legend will be based on these 
+        /// series rather than on a Series property.
+        /// </summary>
+        public ElementCollection<Series.Series> CustomSeries { get; private set; }
 
         /// <summary>
         /// Gets or sets the rendering decorator.

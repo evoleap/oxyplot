@@ -106,12 +106,11 @@ namespace OxyPlot
         /// <exception cref="System.InvalidOperationException">The element cannot be added, it already belongs to a PlotModel.</exception>
         public void Add(T item)
         {
-            if (item.Parent != null)
+            if (item.Parent == null && !IsCustomLegendSeries)
             {
-                throw new InvalidOperationException("The element cannot be added, it already belongs to a PlotModel.");
+                item.Parent = this.parent;
             }
-
-            item.Parent = this.parent;
+                
             this.internalList.Add(item);
         }
 
@@ -195,5 +194,10 @@ namespace OxyPlot
             this[index].Parent = null;
             this.internalList.RemoveAt(index);
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a series is used to display the custom legend.
+        /// </summary>
+        public bool IsCustomLegendSeries { get; set; }
     }
 }
