@@ -288,7 +288,7 @@ namespace OxyPlot
                     OxyColors.Blue,
                     OxyColors.Indigo,
                     OxyColors.Violet
-                };
+            };
 
             this.AxisTierDistance = 4.0;
         }
