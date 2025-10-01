@@ -1,0 +1,95 @@
+trigger:
+- main
+
+pool:
+  name: Default
+
+resources:
+  repositories:
+    - repository: evoleapdevops
+      type: github
+      name: evoleap/devops
+      endpoint: evoleap
+
+variables:
+  solution: '**/*.sln'
+  BuildPlatform: 'Any CPU'
+  BuildConfiguration: 'Release'
+  DevelopmentFolder: '\\hou-nas01-pwss16\development'
+
+steps:
+- task: CopyFiles@1
+  displayName: 'Copy Files to: $(Build.SourcesDirectory)'
+  inputs:
+    SourceFolder: ' $(DevelopmentFolder)\nuspec\evoleap.OxyPlot.Wpf'
+    Contents: evoleap.OxyPlot.Wpf.nuspec
+    TargetFolder: '$(Build.SourcesDirectory)'
+- task: CopyFiles@1
+  displayName: 'Copy Files to: $(Build.SourcesDirectory)'
+  inputs:
+    SourceFolder: ' $(DevelopmentFolder)\nuspec\evoleap.OxyPlot.core.Wpf'
+    Contents: evoleap.OxyPlot.Wpf.nuspec
+    TargetFolder: '$(Build.SourcesDirectory)'
+- task: CmdLine@1
+  displayName: 'Write WorkingVersion.txt'
+  inputs:
+    filename: buildhelper.exe
+    arguments: 'writeWorkingVersion -s evoleap.OxyPlot.Wpf.nuspec -d WorkingVersion.txt'
+- task: CmdLine@1
+  displayName: 'Write VersionForLynx.txt'
+  inputs:
+    filename: buildhelper.exe
+    arguments: 'writeLynxVersionFile -s WorkingVersion.txt -d VersionForLynx.txt'
+- task: CmdLine@1
+  displayName: 'Run UpdateVersionNumbers.exe'
+  inputs:
+    filename: UpdateVersionNumbers.exe
+    arguments: '/VersionFile=VersionForLynx.txt /Dependency=OxyPlot.Core'
+- task: CmdLine@1
+  displayName: 'Update nuspec version'
+  inputs:
+    filename: buildhelper.exe
+    arguments: 'nuspecVersion -s WorkingVersion.txt -d evoleap.OxyPlot.Wpf.nuspec'
+- task: CmdLine@1
+  displayName: 'Update nuspec version'
+  inputs:
+    filename: buildhelper.exe
+    arguments: 'nuspecVersion -s WorkingVersion.txt -d evoleap.OxyPlot.Wpf.core.nuspec'
+- task: NuGetCommand@2
+  displayName: 'NuGet restore'
+  inputs:
+    restoreSolution: 'Source/OxyPlot.WPF.sln;Source/OxyPlot.WPF_NET40.sln'
+    vstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: 'Source/OxyPlot.core.sln'
+    feedsToUse: 'select'
+- task: MSBuild@1
+  displayName: 'Build solution Source/OxyPlot.WPF.sln'
+  inputs:
+    solution: Source/OxyPlot.WPF.sln
+    msbuildVersion: "14.0"
+    platform: '$(BuildPlatform)'
+    configuration: '$(BuildConfiguration)'
+    msbuildArguments: '/p:StyleCopTreatErrorsAsWarnings="True" /p:NuGetExePath="C:\\agent\\externals\\nuget\\nuget.exe"'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: 'Source/OxyPlot.core.sln'
+- task: NuGetPackager@0
+  displayName: 'NuGet Packager '
+  inputs:
+    searchPattern: evoleap.OxyPlot.Wpf.nuspec
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: 'evoleap.OxyPlot.Wpf.core.nuspec'
+    packDirectory: '$(Build.SourcesDirectory)'
+    versioningScheme: 'off'
+- task: NuGetCommand@2
+  displayName: 'NuGet push'
+  inputs:
+    command: push
+    packagesToPush: '$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf.*.nupkg;!$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf.*.symbols.nupkg'
+    publishVstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'
