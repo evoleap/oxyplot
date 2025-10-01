@@ -27,8 +27,8 @@ steps:
 - task: CopyFiles@1
   displayName: 'Copy Files to: $(Build.SourcesDirectory)'
   inputs:
-    SourceFolder: ' $(DevelopmentFolder)\nuspec\evoleap.OxyPlot.core.Wpf'
-    Contents: evoleap.OxyPlot.Wpf.nuspec
+    SourceFolder: ' $(DevelopmentFolder)\nuspec\evoleap.OxyPlot.Wpf'
+    Contents: evoleap.OxyPlot.Wpf.core.nuspec
     TargetFolder: '$(Build.SourcesDirectory)'
 - task: CmdLine@1
   displayName: 'Write WorkingVersion.txt'
