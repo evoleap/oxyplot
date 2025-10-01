@@ -84,11 +84,11 @@ steps:
 #  displayName: 'NuGet Packager '
 #  inputs:
 #    searchPattern: evoleap.OxyPlot.Wpf.nuspec
-- task: DotNetCoreCLI@2
+- task: NuGetCommand@2
   inputs:
     command: 'pack'
     packagesToPack: 'evoleap.OxyPlot.Wpf.core.nuspec'
-    packDirectory: '$(Build.SourcesDirectory)'
+    packDestination: '$(Build.SourcesDirectory)'
     versioningScheme: 'off'
 - task: NuGetCommand@2
   displayName: 'NuGet push'
