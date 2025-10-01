@@ -61,11 +61,13 @@ steps:
     restoreSolution: 'Source/OxyPlot.WPF.sln;Source/OxyPlot.WPF_NET40.sln'
     vstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'
 - task: DotNetCoreCLI@2
+  enabled: false
   inputs:
     command: 'restore'
     projects: 'Source/OxyPlot.core.sln'
     feedsToUse: 'select'
 - task: MSBuild@1
+  enabled: false
   displayName: 'Build solution Source/OxyPlot.WPF.sln'
   inputs:
     solution: Source/OxyPlot.WPF.sln
@@ -77,10 +79,11 @@ steps:
   inputs:
     command: 'build'
     projects: 'Source/OxyPlot.core.sln'
-- task: NuGetPackager@0
-  displayName: 'NuGet Packager '
-  inputs:
-    searchPattern: evoleap.OxyPlot.Wpf.nuspec
+#- task: NuGetPackager@0
+#  enabled: false
+#  displayName: 'NuGet Packager '
+#  inputs:
+#    searchPattern: evoleap.OxyPlot.Wpf.nuspec
 - task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
