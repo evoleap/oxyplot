@@ -12,7 +12,7 @@ namespace OxyPlot.Tests
     using System;
 
     using NUnit.Framework;
-
+    using NUnit.Framework.Legacy;
     using OxyPlot.Axes;
 
     /// <summary>

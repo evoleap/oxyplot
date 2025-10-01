@@ -13,6 +13,7 @@ namespace OxyPlot.Wpf.Tests
     using System.IO;
 
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
     using OxyPlot.Tests;
 
     /// <summary>
@@ -35,7 +36,7 @@ namespace OxyPlot.Wpf.Tests
                 exporter.Export(plotModel, stream);
             }
 
-            Assert.IsTrue(File.Exists(FileName));
+            ClassicAssert.IsTrue(File.Exists(FileName));
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace OxyPlot.Wpf.Tests
                 exporter.Export(plotModel, stream);
             }
 
-            Assert.IsTrue(File.Exists(FileName));
+            ClassicAssert.IsTrue(File.Exists(FileName));
         }
 
         /// <summary>
@@ -73,7 +74,7 @@ namespace OxyPlot.Wpf.Tests
                 exporter.Export(plotModel, stream);
             }
 
-            Assert.IsTrue(File.Exists(fileName));
+            ClassicAssert.IsTrue(File.Exists(fileName));
             PngAssert.AreEqual(Path.Combine("Baseline", fileName), fileName, fileName, Path.Combine("Diff", fileName));
         }
     }

@@ -12,7 +12,6 @@ namespace LegendsDemo
     using OxyPlot;
     using OxyPlot.Series;
 
-    using PropertyTools.DataAnnotations;
     using WpfExamples;
 
     using HorizontalAlignment = OxyPlot.HorizontalAlignment;
@@ -101,7 +100,7 @@ namespace LegendsDemo
             }
         }
 
-        [DisplayName("Curves"), Slidable(1, 32)]
+        [DisplayName("Curves"), PropertyTools.DataAnnotations.Slidable(1, 32)]
         public int NumberOfSeries
         {
             get { return numberOfSeries; }

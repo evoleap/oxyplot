@@ -832,7 +832,7 @@ namespace OxyPlot.OpenXml
                         this.Save();
                     }
 
-                    this.package.Close();
+                    this.package.Dispose();
                 }
             }
 

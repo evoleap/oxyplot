@@ -10,8 +10,8 @@
 namespace OxyPlot.Tests
 {
     using System.Linq;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     /// <summary>
     /// Tests the <see cref="PlotController" /> class.
@@ -32,7 +32,7 @@ namespace OxyPlot.Tests
             {
                 var c = new PlotController();
                 c.Unbind(new OxyMouseDownGesture(OxyMouseButton.Left));
-                Assert.IsFalse(c.InputCommandBindings.Any(b => b.Gesture.Equals(new OxyMouseDownGesture(OxyMouseButton.Left))));
+                ClassicAssert.IsFalse(c.InputCommandBindings.Any(b => b.Gesture.Equals(new OxyMouseDownGesture(OxyMouseButton.Left))));
             }
 
             /// <summary>
@@ -43,7 +43,7 @@ namespace OxyPlot.Tests
             {
                 var c = new PlotController();
                 c.Unbind(PlotCommands.SnapTrack);
-                Assert.IsFalse(c.InputCommandBindings.Any(b => b.Command == PlotCommands.SnapTrack));
+                ClassicAssert.IsFalse(c.InputCommandBindings.Any(b => b.Command == PlotCommands.SnapTrack));
             }
 
             /// <summary>
@@ -54,7 +54,7 @@ namespace OxyPlot.Tests
             {
                 var c = new PlotController();
                 c.UnbindAll();
-                Assert.AreEqual(0, c.InputCommandBindings.Count);
+                ClassicAssert.AreEqual(0, c.InputCommandBindings.Count);
             }
         }
     }

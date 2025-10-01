@@ -10,8 +10,8 @@ namespace OxyPlot.Tests
     using System.Globalization;
     using System.IO;
     using System.Text;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     // ReSharper disable InconsistentNaming
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
@@ -54,7 +54,8 @@ namespace OxyPlot.Tests
             doc.Save(Folder + "DrawText.pdf");
         }
 
-        [Test, Ignore("Not supported")]
+        [Test]
+        [Ignore("Not supported")]
         public void DrawText_SpecialCharacters()
         {
             var doc = new PortableDocument();
@@ -63,7 +64,7 @@ namespace OxyPlot.Tests
             var s = "π";
             doc.DrawText(50, 400, s);
             doc.Save(Folder + "DrawText_SpecialCharacters.pdf");
-            Assert.IsTrue(s[0] > 255);
+            ClassicAssert.IsTrue(s[0] > 255);
         }
 
         [Test]
@@ -453,7 +454,8 @@ namespace OxyPlot.Tests
             doc.Save(Folder + "FillRectangle.pdf");
         }
 
-        [Test, Ignore("Not implemented")]
+        [Test]
+        [Ignore("Not implemented")]
         public void DrawImage()
         {
             var doc = new PortableDocument();

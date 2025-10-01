@@ -9,9 +9,8 @@ namespace OxyPlot.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-
     using NUnit.Framework;
-
+    using NUnit.Framework.Legacy;
     using OxyPlot.Series;
 
     // ReSharper disable InconsistentNaming
@@ -36,18 +35,23 @@ namespace OxyPlot.Tests
             filler.Add("A", (p, v) => p.X = Convert.ToDouble(v));
             filler.Fill(target, this.src);
 
-            Assert.AreEqual(1, target.Count);
-            Assert.AreEqual(3.14, target[0].X);
+            ClassicAssert.AreEqual(1, target.Count);
+            ClassicAssert.AreEqual(3.14, target[0].X);
         }
 
-        [Test, ExpectedException]
+        [Test]
         public void Fill_InvalidProperty_ThrowsException()
         {
             var target = new List<ScatterPoint>();
 
             var filler = new ListFiller<ScatterPoint>();
-            filler.Add("B", (p, v) => p.X = Convert.ToDouble(v));
-            filler.Fill(target, this.src);
+            Assert.That(
+                () =>
+                {
+                    filler.Add("B", (p, v) => p.X = Convert.ToDouble(v));
+                    filler.Fill(target, this.src);
+                },
+                Throws.Exception);
         }
 
         [Test]
@@ -59,8 +63,8 @@ namespace OxyPlot.Tests
             filler.Add(null, (p, v) => { });
             filler.Fill(target, this.src);
 
-            Assert.AreEqual(1, target.Count);
-            Assert.AreEqual(0, target[0].X);
+            ClassicAssert.AreEqual(1, target.Count);
+            ClassicAssert.AreEqual(0, target[0].X);
         }
 
         private class TestObject

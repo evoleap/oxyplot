@@ -9,8 +9,8 @@ namespace OxyPlot.Tests
     using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     // ReSharper disable InconsistentNaming
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
@@ -52,10 +52,10 @@ namespace OxyPlot.Tests
 
         private static void AssertArrayEquals<T>(T[] refOut, T[] actualOut)
         {
-            Assert.AreEqual(refOut.Length, actualOut.Length, "Different length");
+            ClassicAssert.AreEqual(refOut.Length, actualOut.Length, "Different length");
             for (int i = 0; i < refOut.Length; i++)
             {
-                Assert.AreEqual(refOut[i], actualOut[i], "Different at byte " + i);
+                ClassicAssert.AreEqual(refOut[i], actualOut[i], "Different at byte " + i);
             }
         }
     }

@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
+    <RootNamespace>OxyPlot.Wpf.Tests</RootNamespace>
+    <AssemblyName>OxyPlot.Wpf.Tests</AssemblyName>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
@@ -9,6 +11,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
+    <AssemblyTitle>OxyPlot.Wpf.Tests</AssemblyTitle>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs">
@@ -16,54 +19,30 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Schemas\svg.xsd">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Schemas\xlink.xsd">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Schemas\xml.xsd">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Imaging\TestImages\test_32bit.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Imaging\TestImages\test.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Imaging\TestImages\test_24bit.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Imaging\TestImages\test_32bit.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Imaging\TestImages\test_8bit.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Imaging\TestImages\test_8bit.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Series\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Examples\ExampleLibrary\ExampleLibrary.core.csproj" />
+    <ProjectReference Include="..\OxyPlot.Tests\OxyPlot.Tests.core.csproj" />
+    <ProjectReference Include="..\OxyPlot.Wpf\OxyPlot.Wpf.core.csproj" />
     <ProjectReference Include="..\OxyPlot\OxyPlot.core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Baseline\PngExporterTests_ExportWithResolution_192dpi.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Baseline\PngExporterTests_ExportWithResolution_384dpi.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\StyleCop.Analyzers.Unstable.1.2.0.435\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.Unstable.1.2.0.435\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="NUnit" Version="4.4.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435" />
     <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.435" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
 </Project>

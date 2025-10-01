@@ -9,8 +9,8 @@ namespace OxyPlot.Tests
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     // ReSharper disable InconsistentNaming
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
@@ -23,9 +23,9 @@ namespace OxyPlot.Tests
         {
             var d = new PngDecoder();
             var pixels = d.Decode(File.ReadAllBytes(path));
-            Assert.AreEqual(w, pixels.GetLength(0));
-            Assert.AreEqual(h, pixels.GetLength(1));
-            Assert.IsNotNull(pixels);
+            ClassicAssert.AreEqual(w, pixels.GetLength(0));
+            ClassicAssert.AreEqual(h, pixels.GetLength(1));
+            ClassicAssert.IsNotNull(pixels);
             var e = new PngEncoder(new PngEncoderOptions());
             var encodedPixels = e.Encode(pixels);
             File.WriteAllBytes(Path.ChangeExtension(path, "out.png"), encodedPixels);
@@ -38,7 +38,7 @@ namespace OxyPlot.Tests
             var d = new PngDecoder();
 
             // Expect exception here, 8bit pngs are not yet supported
-            Assert.Throws<NotImplementedException>(() => d.Decode(File.ReadAllBytes(path)));
+            ClassicAssert.Throws<NotImplementedException>(() => d.Decode(File.ReadAllBytes(path)));
         }
     }
 }

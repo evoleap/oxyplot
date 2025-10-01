@@ -8,8 +8,8 @@ namespace OxyPlot.Tests
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     // ReSharper disable InconsistentNaming
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
@@ -22,7 +22,7 @@ namespace OxyPlot.Tests
             var bounds = new OxyRect(0, 0, 1, 1);
             var points = CreatePointList();
             var result = SutherlandHodgmanClipping.ClipPolygon(bounds, points);
-            Assert.AreEqual(4, result.Count);
+            ClassicAssert.AreEqual(4, result.Count);
         }
 
         private static IList<ScreenPoint> CreatePointList()

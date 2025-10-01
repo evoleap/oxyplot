@@ -8,8 +8,8 @@ namespace OxyPlot.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     // ReSharper disable InconsistentNaming
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
@@ -19,13 +19,13 @@ namespace OxyPlot.Tests
         [Test]
         public void ConvertToFractionString()
         {
-            Assert.AreEqual("3/4", FractionHelper.ConvertToFractionString(0.75));
+            ClassicAssert.AreEqual("3/4", FractionHelper.ConvertToFractionString(0.75));
         }
 
         [Test]
         public void ConvertToFractionString_WithUnit()
         {
-            Assert.AreEqual("2pi", FractionHelper.ConvertToFractionString(Math.PI * 2, Math.PI, "pi"));
+            ClassicAssert.AreEqual("2pi", FractionHelper.ConvertToFractionString(Math.PI * 2, Math.PI, "pi"));
         }
     }
 }

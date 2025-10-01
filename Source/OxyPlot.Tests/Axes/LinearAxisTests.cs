@@ -11,9 +11,8 @@ namespace OxyPlot.Tests
 {
     using System;
     using System.Globalization;
-
     using NUnit.Framework;
-
+    using NUnit.Framework.Legacy;
     using OxyPlot.Axes;
 
     /// <summary>
@@ -35,7 +34,7 @@ namespace OxyPlot.Tests
             {
                 var axis1 = new LinearAxis();
                 var axis2 = new LinearAxis();
-                Assert.IsTrue(axis1.GetHashCode() != axis2.GetHashCode());
+                ClassicAssert.IsTrue(axis1.GetHashCode() != axis2.GetHashCode());
             }
         }
 
@@ -56,7 +55,7 @@ namespace OxyPlot.Tests
                     FractionUnit = Math.PI,
                     FractionUnitSymbol = "π"
                 };
-                Assert.AreEqual("0", axis.FormatValue(0));
+                ClassicAssert.AreEqual("0", axis.FormatValue(0));
             }
 
             /// <summary>
@@ -71,7 +70,7 @@ namespace OxyPlot.Tests
                     FractionUnit = Math.PI,
                     FractionUnitSymbol = "π"
                 };
-                Assert.AreEqual("π/2", axis.FormatValue(0.5 * Math.PI));
+                ClassicAssert.AreEqual("π/2", axis.FormatValue(0.5 * Math.PI));
             }
 
             /// <summary>
@@ -86,7 +85,7 @@ namespace OxyPlot.Tests
                     FractionUnit = Math.PI,
                     FractionUnitSymbol = "π"
                 };
-                Assert.AreEqual("2π", axis.FormatValue(2 * Math.PI));
+                ClassicAssert.AreEqual("2π", axis.FormatValue(2 * Math.PI));
             }
 
             /// <summary>
@@ -101,7 +100,7 @@ namespace OxyPlot.Tests
                     FractionUnit = Math.PI,
                     FractionUnitSymbol = "π"
                 };
-                Assert.AreEqual("3π/2", axis.FormatValue(3d / 2 * Math.PI));
+                ClassicAssert.AreEqual("3π/2", axis.FormatValue(3d / 2 * Math.PI));
             }
 
             /// <summary>
@@ -120,7 +119,7 @@ namespace OxyPlot.Tests
                 };
                 model.Axes.Add(axis);
                 ((IPlotModel)model).Update(true);
-                Assert.AreEqual("1.273π", axis.FormatValue(4));
+                ClassicAssert.AreEqual("1.273π", axis.FormatValue(4));
             }
         }
     }

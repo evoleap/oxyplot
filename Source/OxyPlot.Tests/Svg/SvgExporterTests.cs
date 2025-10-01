@@ -9,10 +9,9 @@ namespace OxyPlot.Tests
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
-
     using ExampleLibrary;
     using NUnit.Framework;
-
+    using NUnit.Framework.Legacy;
     using OxyPlot.Series;
 
     // ReSharper disable InconsistentNaming
@@ -74,7 +73,7 @@ namespace OxyPlot.Tests
                     SvgExporter.Export(example.PlotModel, s, 800, 500, true);
                 }
 
-                Assert.IsTrue(File.Exists(path));
+                ClassicAssert.IsTrue(File.Exists(path));
             }
         }
     }

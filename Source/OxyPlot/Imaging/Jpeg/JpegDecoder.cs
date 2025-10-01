@@ -423,5 +423,10 @@ namespace OxyPlot
         {
             throw new NotImplementedException();
         }
+
+        OxyColor[,] IImageDecoder.Decode(byte[] bytes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -11,7 +11,7 @@ namespace OxyPlot.Tests
     using System.Diagnostics.CodeAnalysis;
     using NSubstitute;
     using NUnit.Framework;
-
+    using NUnit.Framework.Legacy;
     using OxyPlot.Axes;
     using OxyPlot.Series;
 
@@ -23,43 +23,43 @@ namespace OxyPlot.Tests
         [Test]
         public void ToDouble_ValidDate()
         {
-            Assert.AreEqual(40616, DateTimeAxis.ToDouble(new DateTime(2011, 3, 15)));
+            ClassicAssert.AreEqual(40616, DateTimeAxis.ToDouble(new DateTime(2011, 3, 15)));
         }
 
         [Test]
         public void ToDouble_NoDate()
         {
-            Assert.AreEqual(-693594, DateTimeAxis.ToDouble(new DateTime()));
+            ClassicAssert.AreEqual(-693594, DateTimeAxis.ToDouble(new DateTime()));
         }
 
         [Test]
         public void ToDateTime_ValidDate()
         {
-            Assert.AreEqual(new DateTime(2011, 3, 15), DateTimeAxis.ToDateTime(40616));
+            ClassicAssert.AreEqual(new DateTime(2011, 3, 15), DateTimeAxis.ToDateTime(40616));
         }
 
         [Test]
         public void ToDateTime_NoDate()
         {
-            Assert.AreEqual(new DateTime(), DateTimeAxis.ToDateTime(-693594));
+            ClassicAssert.AreEqual(new DateTime(), DateTimeAxis.ToDateTime(-693594));
         }
 
         [Test]
         public void ToDateTime_NaN()
         {
-            Assert.AreEqual(new DateTime(), DateTimeAxis.ToDateTime(double.NaN));
+            ClassicAssert.AreEqual(new DateTime(), DateTimeAxis.ToDateTime(double.NaN));
         }
 
         [Test]
         public void ToDateTime_VeryBigValue()
         {
-            Assert.AreEqual(new DateTime(), DateTimeAxis.ToDateTime(double.MaxValue));
+            ClassicAssert.AreEqual(new DateTime(), DateTimeAxis.ToDateTime(double.MaxValue));
         }
 
         [Test]
         public void ToDateTime_VerySmallValue()
         {
-            Assert.AreEqual(new DateTime(), DateTimeAxis.ToDateTime(double.MinValue));
+            ClassicAssert.AreEqual(new DateTime(), DateTimeAxis.ToDateTime(double.MinValue));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace OxyPlot.Tests
             axis.MinorStep = double.NaN;
 
             plot.Axes.Add(axis);
-                var yaxis1 = new LinearAxis { Position = AxisPosition.Left, Title = "Y1", Key = "Y1", StartPosition = 0, EndPosition = 0.5 };
+            var yaxis1 = new LinearAxis { Position = AxisPosition.Left, Title = "Y1", Key = "Y1", StartPosition = 0, EndPosition = 0.5 };
             plot.Axes.Add(yaxis1);
             axis.Reset();
             ((IPlotModel)plot).Render(rc, 500, 500);
@@ -87,7 +87,7 @@ namespace OxyPlot.Tests
             IList<double> majorTickValues;
             IList<double> minorTickValues;
             axis.GetTickValues(out majorLabelValues, out majorTickValues, out minorTickValues);
-            Assert.AreEqual(5, majorLabelValues.Count);
+            ClassicAssert.AreEqual(5, majorLabelValues.Count);
 
             Action<LineSeries> addExamplePoints = ls =>
             {
@@ -116,7 +116,7 @@ namespace OxyPlot.Tests
             axis.Render(rc, plot, AxisLayer.BelowSeries, 2);
 
             axis.GetTickValues(out majorLabelValues, out majorTickValues, out minorTickValues);
-            Assert.AreEqual(8, majorLabelValues.Count);
+            ClassicAssert.AreEqual(8, majorLabelValues.Count);
         }
 
         [Test]
@@ -145,7 +145,7 @@ namespace OxyPlot.Tests
             IList<double> minorTickValues;
 
             axis.GetTickValues(out majorLabelValues, out majorTickValues, out minorTickValues);
-            Assert.AreEqual(16, majorLabelValues.Count);
+            ClassicAssert.AreEqual(16, majorLabelValues.Count);
         }
     }
 }

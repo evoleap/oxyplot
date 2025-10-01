@@ -52,7 +52,7 @@ namespace OxyPlot.Tests
                     }
                 }
 
-                Assert.IsTrue(File.Exists(path));
+                Assert.That(File.Exists(path), Is.True);
             }
         }
     }

@@ -16,8 +16,8 @@ namespace OxyPlot.Wpf.Tests
     using System.Linq;
     using System.Windows;
     using System.Windows.Media;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     /// <summary>
     /// Provides specialized unit test assertion methods.
@@ -53,7 +53,7 @@ namespace OxyPlot.Wpf.Tests
                 }
             }
 
-            Assert.IsTrue(result);
+            ClassicAssert.IsTrue(result);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace OxyPlot.Wpf.Tests
                 result = false;
             }
 
-            Assert.IsTrue(result);
+            ClassicAssert.IsTrue(result);
         }
 
         /// <summary>
