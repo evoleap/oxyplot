@@ -58,6 +58,7 @@ steps:
     arguments: 'nuspecVersion -s WorkingVersion.txt -d evoleap.OxyPlot.Wpf.core.nuspec'
 - task: NuGetCommand@2
   displayName: 'NuGet restore'
+  enabled: false
   inputs:
     restoreSolution: 'Source/OxyPlot.WPF.sln;Source/OxyPlot.WPF_NET40.sln'
     vstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'
