@@ -20,6 +20,7 @@ namespace OxyPlot.Tests
     public class PdfExporterTests
     {
         [Test]
+        [Ignore("10 minutes is too long for a unit test. Need to use a sampling approach and time bound execution.")]
         public void Export_AllExamplesInExampleLibrary_CheckThatAllFilesExist()
         {
             const string DestinationDirectory = "PdfExporterTests_ExampleLibrary";

@@ -43,9 +43,9 @@ namespace OxyPlot.Pdf.Tests
             var g = XGraphics.FromPdfPage(page);
             var s = 72 / 25.4;
             g.DrawString("This is 12pt " + fontName + " regular.", new XFont(fontName, 12), XBrushes.Black, 20 * s, 20 * s);
-            g.DrawString("This is 12pt " + fontName + " bold.", new XFont(fontName, 12, XFontStyle.Bold), XBrushes.Black, 20 * s, 30 * s);
-            g.DrawString("This is 12pt " + fontName + " italic.", new XFont(fontName, 12, XFontStyle.Italic), XBrushes.Black, 20 * s, 40 * s);
-            g.DrawString("This is 12pt " + fontName + " bold and italic.", new XFont(fontName, 12, XFontStyle.BoldItalic), XBrushes.Black, 20 * s, 50 * s);
+            g.DrawString("This is 12pt " + fontName + " bold.", new XFont(fontName, 12, XFontStyleEx.Bold), XBrushes.Black, 20 * s, 30 * s);
+            g.DrawString("This is 12pt " + fontName + " italic.", new XFont(fontName, 12, XFontStyleEx.Italic), XBrushes.Black, 20 * s, 40 * s);
+            g.DrawString("This is 12pt " + fontName + " bold and italic.", new XFont(fontName, 12, XFontStyleEx.BoldItalic), XBrushes.Black, 20 * s, 50 * s);
             doc.Save(Folder + fontName + ".pdf");
         }
 

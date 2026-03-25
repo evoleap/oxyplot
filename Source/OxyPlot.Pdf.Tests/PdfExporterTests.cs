@@ -21,6 +21,7 @@ namespace OxyPlot.Pdf.Tests
     public class PdfExporterTests
     {
         [Test]
+        [Ignore("This runs for way too long. Ignore but later add random sample tests.")]
         public void Export_AllExamplesInExampleLibrary_CheckThatAllFilesExist()
         {
             const string DestinationDirectory = "PdfExporterTests_ExampleLibrary";

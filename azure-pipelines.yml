@@ -16,6 +16,7 @@ variables:
   BuildPlatform: 'Any CPU'
   BuildConfiguration: 'Release'
   DevelopmentFolder: '\\hou-nas01-pwss16\development'
+  prBuild: $[contains(variables['Build.SourceBranch'], '/merge')]
 
 steps:
 - task: CopyFiles@1
@@ -67,11 +68,9 @@ steps:
     projects: 'Source/OxyPlot.core.sln'
     feedsToUse: 'select'
 - task: MSBuild@1
-  enabled: false
   displayName: 'Build solution Source/OxyPlot.WPF.sln'
   inputs:
     solution: Source/OxyPlot.WPF.sln
-    msbuildVersion: "14.0"
     platform: '$(BuildPlatform)'
     configuration: '$(BuildConfiguration)'
     msbuildArguments: '/p:StyleCopTreatErrorsAsWarnings="True" /p:NuGetExePath="C:\\agent\\externals\\nuget\\nuget.exe"'
@@ -79,11 +78,14 @@ steps:
   inputs:
     command: 'build'
     projects: 'Source/OxyPlot.core.sln'
-#- task: NuGetPackager@0
-#  enabled: false
-#  displayName: 'NuGet Packager '
-#  inputs:
-#    searchPattern: evoleap.OxyPlot.Wpf.nuspec
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: 'Source/OxyPlot.core.sln'
+- task: NuGetPackager@0
+  displayName: 'NuGet Packager '
+  inputs:
+    searchPattern: evoleap.OxyPlot.Wpf.nuspec
 - task: NuGetCommand@2
   inputs:
     command: 'pack'
@@ -92,7 +94,8 @@ steps:
     versioningScheme: 'off'
 - task: NuGetCommand@2
   displayName: 'NuGet push'
+  condition: and(succeeded(), not(eq(variables['prBuild'], 'True')))
   inputs:
     command: push
-    packagesToPush: '$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf.*.nupkg;!$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf.*.symbols.nupkg'
+    packagesToPush: '$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf*.nupkg;!$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf*.symbols.nupkg'
     publishVstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'

@@ -257,7 +257,7 @@ namespace OxyPlot.Pdf
                 fs = XFontStyleEx.Bold;
             }
 
-            var font = new XFont(fontFamily, (float)fontSize * FontsizeFactor, fs);
+            var font = new XFont(fontFamily ?? "Times New Roman", (float)fontSize * FontsizeFactor, fs);
 
             var size = this.g.MeasureString(text, font);
 

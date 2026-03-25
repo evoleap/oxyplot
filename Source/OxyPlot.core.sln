@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36327.8
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11520.95 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OxyPlot.core", "OxyPlot\OxyPlot.core.csproj", "{27E7D009-F9D1-D1D0-AEA3-17C4C6F6A572}"
 EndProject
@@ -24,6 +24,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OxyPlot.Pdf.core", "OxyPlot.Pdf\OxyPlot.Pdf.core.csproj", "{12737C3F-5770-403F-90A1-BC12EBD1BB31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OxyPlot.Xps.core", "OxyPlot.Xps\OxyPlot.Xps.core.csproj", "{639E0B40-A307-4D4A-BB78-BE0019D8D7C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OxyPlot.Pdf.core.Tests", "OxyPlot.Pdf.Tests\OxyPlot.Pdf.core.Tests.csproj", "{0736C98F-B866-1A20-CFB1-48C81AD71AD2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Items", "Build Items", "{8E6B59D7-29AD-49E0-969D-652A85D60DC7}"
+	ProjectSection(SolutionItems) = preProject
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +74,10 @@ Global
 		{639E0B40-A307-4D4A-BB78-BE0019D8D7C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{639E0B40-A307-4D4A-BB78-BE0019D8D7C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{639E0B40-A307-4D4A-BB78-BE0019D8D7C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0736C98F-B866-1A20-CFB1-48C81AD71AD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0736C98F-B866-1A20-CFB1-48C81AD71AD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0736C98F-B866-1A20-CFB1-48C81AD71AD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0736C98F-B866-1A20-CFB1-48C81AD71AD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

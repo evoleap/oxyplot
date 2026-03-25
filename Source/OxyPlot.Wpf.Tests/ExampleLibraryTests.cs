@@ -26,6 +26,7 @@ namespace OxyPlot.Wpf.Tests
         /// if it does not exist.
         /// </summary>
         [Test]
+        [Ignore("3 1/2 minutes is too long for a unit test. Need to use a sampling approach and time bound execution.")]
         public void CompareWithBaseline()
         {
             const string DestinationDirectory = "ExampleLibrary";
