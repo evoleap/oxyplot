@@ -8,9 +8,8 @@ namespace OxyPlot.Pdf.Tests
 {
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
-
     using NUnit.Framework;
-
+    using NUnit.Framework.Legacy;
     using OxyPlot.Reporting;
 
     // ReSharper disable InconsistentNaming
@@ -28,7 +27,7 @@ namespace OxyPlot.Pdf.Tests
                 w.WriteReport(CreateReport(), new ReportStyle());
             }
 
-            Assert.IsTrue(new FileInfo(FileName).Length > 0);
+            ClassicAssert.IsTrue(new FileInfo(FileName).Length > 0);
         }
 
         [Test]
@@ -40,7 +39,7 @@ namespace OxyPlot.Pdf.Tests
                 w.WriteReport(CreateReport(), new ReportStyle());
             }
 
-            Assert.IsTrue(new FileInfo(FileName).Length > 0);
+            ClassicAssert.IsTrue(new FileInfo(FileName).Length > 0);
         }
 
         [Test]
@@ -58,7 +57,7 @@ namespace OxyPlot.Pdf.Tests
                 w.WriteReport(r, new ReportStyle());
             }
 
-            Assert.IsTrue(new FileInfo(FileName).Length > 0);
+            ClassicAssert.IsTrue(new FileInfo(FileName).Length > 0);
         }
 
         private static Report CreateReport()

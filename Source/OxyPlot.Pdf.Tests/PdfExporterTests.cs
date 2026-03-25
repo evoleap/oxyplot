@@ -11,7 +11,7 @@ namespace OxyPlot.Pdf.Tests
 
     using ExampleLibrary;
     using NUnit.Framework;
-
+    using NUnit.Framework.Legacy;
     using OxyPlot.Pdf;
     using OxyPlot.Tests;
 
@@ -46,7 +46,7 @@ namespace OxyPlot.Pdf.Tests
                     PdfExporter.Export(example.PlotModel, s, Width, Height);
                 }
 
-                Assert.IsTrue(File.Exists(path));
+                ClassicAssert.IsTrue(File.Exists(path));
             }
         }
     }

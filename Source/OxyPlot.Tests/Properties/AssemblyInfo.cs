@@ -11,4 +11,7 @@ using NUnit.Framework;
 [assembly: AssemblyTitle("OxyPlot.Tests")]
 [assembly: AssemblyDescription("Unit tests for OxyPlot")]
 
+#if NETFRAMEWORK
 [assembly: RequiresSTA]
+#else
+#endif
