@@ -69,7 +69,7 @@ steps:
     platform: '$(BuildPlatform)'
     configuration: '$(BuildConfiguration)'
     msbuildArguments: '/p:StyleCopTreatErrorsAsWarnings="True"'
-    restoreNugetPackages: false
+    restoreNugetPackages: true
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
