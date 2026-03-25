@@ -61,12 +61,6 @@ steps:
   inputs:
     restoreSolution: 'Source/OxyPlot.WPF.sln;Source/OxyPlot.WPF_NET40.sln'
     vstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'
-- task: DotNetCoreCLI@2
-  enabled: false
-  inputs:
-    command: 'restore'
-    projects: 'Source/OxyPlot.core.sln'
-    feedsToUse: 'select'
 - task: MSBuild@1
   displayName: 'Build solution Source/OxyPlot.WPF.sln'
   inputs:
@@ -74,6 +68,12 @@ steps:
     platform: '$(BuildPlatform)'
     configuration: '$(BuildConfiguration)'
     msbuildArguments: '/p:StyleCopTreatErrorsAsWarnings="True" /p:NuGetExePath="C:\\agent\\externals\\nuget\\nuget.exe"'
+    restoreNugetPackages: true
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: 'Source/OxyPlot.core.sln'
+    feedsToUse: 'select'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
