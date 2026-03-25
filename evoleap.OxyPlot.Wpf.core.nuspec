@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>evoleap.OxyPlot.Wpf.core</id>
+    <version>0.0.0.0</version>
+    <authors>evoleap</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Modified version of OxyPlot.  OxyPlot is an open source plotting library for .NET 8. This package contains the custom control for WPF applications.</description>
+    <tags>wpf plotting plot charting chart</tags>
+  </metadata>
+  <files>
+    <file src="Source\OxyPlot\bin\Debug\netstandard2.0\OxyPlot.dll" target="lib\net8.0-windows" />
+    <file src="Source\OxyPlot\bin\Debug\netstandard2.0\OxyPlot.xml" target="lib\net8.0-windows" />
+    <file src="Source\OxyPlot.WPF\bin\Debug\net8.0-windows\OxyPlot.Wpf.dll" target="lib\net8.0-windows" />
+    <file src="Source\OxyPlot.WPF\bin\Debug\net8.0-windows\OxyPlot.Wpf.xml" target="lib\net8.0-windows" />
+  </files>
+</package>
