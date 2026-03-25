@@ -13,6 +13,7 @@ namespace OxyPlot.Wpf.Tests
     using System.Windows;
 
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     /// <summary>
     /// Provides unit tests for the <see cref="PlotView" /> class.
@@ -28,14 +29,15 @@ namespace OxyPlot.Wpf.Tests
             /// <summary>
             /// Gets the actual model when model is not set.
             /// </summary>
-            [Test, Ignore]
+            [Test]
+            [Ignore("because")]
             public void GetDefault()
             {
                 var w = new Window();
                 var plotView = new PlotView();
                 w.Content = plotView;
                 w.Show();
-                Assert.IsNotNull(plotView.ActualModel);
+                ClassicAssert.IsNotNull(plotView.ActualModel);
             }
 
             /// <summary>
@@ -46,7 +48,7 @@ namespace OxyPlot.Wpf.Tests
             {
                 var model = new PlotModel();
                 var plotView = new PlotView { Model = model };
-                Assert.AreEqual(model, plotView.ActualModel);
+                ClassicAssert.AreEqual(model, plotView.ActualModel);
             }
 
             /// <summary>
@@ -59,7 +61,7 @@ namespace OxyPlot.Wpf.Tests
                 var plotView = new PlotView { Model = model };
                 PlotModel actualModel = null;
                 Task.Factory.StartNew(() => actualModel = plotView.ActualModel).Wait();
-                Assert.AreEqual(model, actualModel);
+                ClassicAssert.AreEqual(model, actualModel);
             }
         }
 

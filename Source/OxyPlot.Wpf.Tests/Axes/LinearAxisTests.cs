@@ -10,6 +10,7 @@
 namespace OxyPlot.Wpf.Tests
 {
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     /// <summary>
     /// Provides unit tests for the <see cref="LinearAxis" /> class.
@@ -29,14 +30,14 @@ namespace OxyPlot.Wpf.Tests
             {
                 var axis = new Axes.LinearAxis();
                 var wpfAxis = new LinearAxis();
-                Assert.AreEqual(axis.TitleColor, wpfAxis.TitleColor.ToOxyColor(), "TitleColor");
-                Assert.AreEqual(axis.Title, wpfAxis.Title, "Title");
-                Assert.AreEqual(axis.TitleClippingLength, wpfAxis.TitleClippingLength, "TitleClippingLength");
-                Assert.AreEqual(axis.TitleFont, wpfAxis.TitleFont, "TitleFont");
-                Assert.AreEqual(axis.TitleFontSize, wpfAxis.TitleFontSize, "TitleFontSize");
-                Assert.AreEqual(axis.TitleFontWeight, wpfAxis.TitleFontWeight.ToOpenTypeWeight(), "TitleFontWeight");
-                Assert.AreEqual(axis.TitleFormatString, wpfAxis.TitleFormatString, "TitleFormatString");
-                Assert.AreEqual(axis.TitlePosition, wpfAxis.TitlePosition, "TitlePosition");
+                ClassicAssert.AreEqual(axis.TitleColor, wpfAxis.TitleColor.ToOxyColor(), "TitleColor");
+                ClassicAssert.AreEqual(axis.Title, wpfAxis.Title, "Title");
+                ClassicAssert.AreEqual(axis.TitleClippingLength, wpfAxis.TitleClippingLength, "TitleClippingLength");
+                ClassicAssert.AreEqual(axis.TitleFont, wpfAxis.TitleFont, "TitleFont");
+                ClassicAssert.AreEqual(axis.TitleFontSize, wpfAxis.TitleFontSize, "TitleFontSize");
+                ClassicAssert.AreEqual(axis.TitleFontWeight, wpfAxis.TitleFontWeight.ToOpenTypeWeight(), "TitleFontWeight");
+                ClassicAssert.AreEqual(axis.TitleFormatString, wpfAxis.TitleFormatString, "TitleFormatString");
+                ClassicAssert.AreEqual(axis.TitlePosition, wpfAxis.TitlePosition, "TitlePosition");
             }
         }
     }

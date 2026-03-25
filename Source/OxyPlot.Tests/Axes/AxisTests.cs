@@ -233,7 +233,6 @@ namespace OxyPlot.Tests
             OxyAssert.AreEqual(plot, "A18");
         }
 
-
         [Test]
         public void B01_LogarithmicAxis()
         {
@@ -434,7 +433,7 @@ namespace OxyPlot.Tests
             var plot = new PlotModel { Title = "Simple plot" };
             plot.Axes.Add(new LinearAxis { AbsoluteMaximum = 0, AbsoluteMinimum = 0 });
             ((IPlotModel)plot).Update(true);
-            Assert.IsNotNull(plot.GetLastUpdateException() as InvalidOperationException);
+            Assert.That(plot.GetLastUpdateException() as InvalidOperationException, Is.Not.Null);
         }
 
         [Test]
@@ -443,8 +442,8 @@ namespace OxyPlot.Tests
             var plot = new PlotModel { Title = "Simple plot" };
             plot.Axes.Add(new LinearAxis { Maximum = 0, Minimum = 0 });
             ((IPlotModel)plot).Update(true);
-            Assert.AreEqual(100, plot.Axes[0].ActualMaximum);
-            Assert.AreEqual(0, plot.Axes[0].ActualMinimum);
+            Assert.That(100, Is.EqualTo(plot.Axes[0].ActualMaximum));
+            Assert.That(0, Is.EqualTo(plot.Axes[0].ActualMinimum));
         }
 
         [Test]
@@ -453,8 +452,8 @@ namespace OxyPlot.Tests
             var plot = new PlotModel { Title = "Simple plot" };
             plot.Axes.Add(new LogarithmicAxis { Maximum = 1, Minimum = 1 });
             ((IPlotModel)plot).Update(true);
-            Assert.AreEqual(100, plot.Axes[0].ActualMaximum);
-            Assert.AreEqual(1, plot.Axes[0].ActualMinimum);
+            Assert.That(100, Is.EqualTo(plot.Axes[0].ActualMaximum));
+            Assert.That(1, Is.EqualTo(plot.Axes[0].ActualMinimum));
         }
 
         [Test]
@@ -463,8 +462,8 @@ namespace OxyPlot.Tests
             var plot = new PlotModel { Title = "Simple plot" };
             plot.Axes.Add(new LogarithmicAxis { Maximum = 1, Minimum = 0 });
             ((IPlotModel)plot).Update(true);
-            Assert.AreEqual(100, plot.Axes[0].ActualMaximum);
-            Assert.AreEqual(1, plot.Axes[0].ActualMinimum);
+            Assert.That(100, Is.EqualTo(plot.Axes[0].ActualMaximum));
+            Assert.That(1, Is.EqualTo(plot.Axes[0].ActualMinimum));
         }
     }
 }

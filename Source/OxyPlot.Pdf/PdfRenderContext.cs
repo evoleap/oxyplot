@@ -251,13 +251,13 @@ namespace OxyPlot.Pdf
                 return;
             }
 
-            var fs = XFontStyle.Regular;
+            var fs = XFontStyleEx.Regular;
             if (fontWeight > FontWeights.Normal)
             {
-                fs = XFontStyle.Bold;
+                fs = XFontStyleEx.Bold;
             }
 
-            var font = new XFont(fontFamily, (float)fontSize * FontsizeFactor, fs);
+            var font = new XFont(fontFamily ?? "Times New Roman", (float)fontSize * FontsizeFactor, fs);
 
             var size = this.g.MeasureString(text, font);
 
@@ -332,10 +332,10 @@ namespace OxyPlot.Pdf
                 return OxySize.Empty;
             }
 
-            var fs = XFontStyle.Regular;
+            var fs = XFontStyleEx.Regular;
             if (fontWeight > FontWeights.Normal)
             {
-                fs = XFontStyle.Bold;
+                fs = XFontStyleEx.Bold;
             }
 
             var font = new XFont(fontFamily, (float)fontSize * FontsizeFactor, fs);

@@ -10,8 +10,7 @@
 namespace OxyPlot.Tests
 {
     using System.IO;
-
-    using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     /// <summary>
     /// Provides methods to assert that plots look as expected.
@@ -50,7 +49,7 @@ namespace OxyPlot.Tests
             var baselineSvg = File.ReadAllText(baseline);
             var actualSvg = File.ReadAllText(path);
 
-            Assert.IsTrue(string.Equals(baselineSvg, actualSvg), "Actual svg is not equal to baseline (" + Path.GetFullPath(baseline) + ")");
+            ClassicAssert.IsTrue(string.Equals(baselineSvg, actualSvg), "Actual svg is not equal to baseline (" + Path.GetFullPath(baseline) + ")");
         }
     }
 }

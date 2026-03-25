@@ -9,8 +9,8 @@ namespace OxyPlot.Tests
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     // ReSharper disable InconsistentNaming
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
@@ -20,19 +20,19 @@ namespace OxyPlot.Tests
         [Test]
         public void Format_StandardFormatString()
         {
-            Assert.AreEqual("3.1", StringHelper.Format(CultureInfo.InvariantCulture, "{0}", null, 3.1));
-            Assert.AreEqual("3.14", StringHelper.Format(CultureInfo.InvariantCulture, "{0:0.00}", null, Math.PI));
-            Assert.AreEqual("PI=3.14", StringHelper.Format(CultureInfo.InvariantCulture, "PI={0:0.00}", null, Math.PI));
+            ClassicAssert.AreEqual("3.1", StringHelper.Format(CultureInfo.InvariantCulture, "{0}", null, 3.1));
+            ClassicAssert.AreEqual("3.14", StringHelper.Format(CultureInfo.InvariantCulture, "{0:0.00}", null, Math.PI));
+            ClassicAssert.AreEqual("PI=3.14", StringHelper.Format(CultureInfo.InvariantCulture, "PI={0:0.00}", null, Math.PI));
         }
 
         [Test]
         public void Format_Item()
         {
             var item = new Item { Text = "Hello World", Value = 3.14 };
-            Assert.AreEqual(
+            ClassicAssert.AreEqual(
                 "3.14 3 Hello World 3.140",
                 StringHelper.Format(CultureInfo.InvariantCulture, "{0} {1:0} {Text} {Value:0.000}", item, item.Value, item.Value));
-            Assert.AreEqual(
+            ClassicAssert.AreEqual(
                 "Hello World",
                 StringHelper.Format(CultureInfo.InvariantCulture, "{Text}", item));
         }

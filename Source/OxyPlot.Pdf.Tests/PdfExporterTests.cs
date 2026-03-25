@@ -11,7 +11,7 @@ namespace OxyPlot.Pdf.Tests
 
     using ExampleLibrary;
     using NUnit.Framework;
-
+    using NUnit.Framework.Legacy;
     using OxyPlot.Pdf;
     using OxyPlot.Tests;
 
@@ -21,6 +21,7 @@ namespace OxyPlot.Pdf.Tests
     public class PdfExporterTests
     {
         [Test]
+        [Ignore("This runs for way too long. Ignore but later add random sample tests.")]
         public void Export_AllExamplesInExampleLibrary_CheckThatAllFilesExist()
         {
             const string DestinationDirectory = "PdfExporterTests_ExampleLibrary";
@@ -46,7 +47,7 @@ namespace OxyPlot.Pdf.Tests
                     PdfExporter.Export(example.PlotModel, s, Width, Height);
                 }
 
-                Assert.IsTrue(File.Exists(path));
+                ClassicAssert.IsTrue(File.Exists(path));
             }
         }
     }

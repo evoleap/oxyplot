@@ -12,8 +12,8 @@ namespace OxyPlot.Wpf.Tests
     using System;
     using System.IO;
     using System.Windows.Media.Imaging;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     /// <summary>
     /// Provides assertions on image files.
@@ -36,17 +36,17 @@ namespace OxyPlot.Wpf.Tests
             {
                 EnsureFolder(expected);
                 File.Copy(actual, expected);
-                Assert.Fail("File not found: {0}", expected);
+                ClassicAssert.Fail($"File not found: {expected}");
             }
 
             if (expectedImage.GetLength(0) != actualImage.GetLength(0))
             {
-                Assert.Fail("Expected height: {0}\nActual height:{1}\n{2}", expectedImage.GetLength(0), actualImage.GetLength(0), message);
+                Assert.Fail(string.Format("Expected height: {0}\nActual height:{1}\n{2}", expectedImage.GetLength(0), actualImage.GetLength(0), message));
             }
 
             if (expectedImage.GetLength(1) != actualImage.GetLength(1))
             {
-                Assert.Fail("Expected width: {0}\nActual width:{1}\n{2}", expectedImage.GetLength(1), actualImage.GetLength(1), message);
+                Assert.Fail(string.Format("Expected width: {0}\nActual width:{1}\n{2}", expectedImage.GetLength(1), actualImage.GetLength(1), message));
             }
 
             var w = expectedImage.GetLength(0);
@@ -88,7 +88,7 @@ namespace OxyPlot.Wpf.Tests
                     File.WriteAllBytes(output, encoder.Encode(differenceImage));
                 }
 
-                Assert.Fail("Pixel differences: {0}\n{1}", differences, message);
+                Assert.Fail(string.Format("Pixel differences: {0}\n{1}", differences, message));
             }
         }
 

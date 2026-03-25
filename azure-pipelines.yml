@@ -16,6 +16,7 @@ variables:
   BuildPlatform: 'Any CPU'
   BuildConfiguration: 'Release'
   DevelopmentFolder: '\\hou-nas01-pwss16\development'
+  prBuild: $[contains(variables['Build.SourceBranch'], '/merge')]
 
 steps:
 - task: CopyFiles@1
@@ -27,8 +28,8 @@ steps:
 - task: CopyFiles@1
   displayName: 'Copy Files to: $(Build.SourcesDirectory)'
   inputs:
-    SourceFolder: ' $(DevelopmentFolder)\nuspec\evoleap.OxyPlot.core.Wpf'
-    Contents: evoleap.OxyPlot.Wpf.nuspec
+    SourceFolder: ' $(DevelopmentFolder)\nuspec\evoleap.OxyPlot.Wpf'
+    Contents: evoleap.OxyPlot.Wpf.core.nuspec
     TargetFolder: '$(Build.SourcesDirectory)'
 - task: CmdLine@1
   displayName: 'Write WorkingVersion.txt'
@@ -55,19 +56,19 @@ steps:
   inputs:
     filename: buildhelper.exe
     arguments: 'nuspecVersion -s WorkingVersion.txt -d evoleap.OxyPlot.Wpf.core.nuspec'
-- task: NuGetCommand@2
-  displayName: 'NuGet restore'
+- task: DotNetCoreCLI@2
+  displayName: 'Restore NuGet packages for OxyPlot.WPF.sln'
   inputs:
-    restoreSolution: 'Source/OxyPlot.WPF.sln;Source/OxyPlot.WPF_NET40.sln'
-    vstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'
+    command: 'restore'
+    projects: 'Source/OxyPlot.WPF.sln'
+    feedsToUse: 'select'
 - task: MSBuild@1
   displayName: 'Build solution Source/OxyPlot.WPF.sln'
   inputs:
     solution: Source/OxyPlot.WPF.sln
-    msbuildVersion: "14.0"
     platform: '$(BuildPlatform)'
     configuration: '$(BuildConfiguration)'
-    msbuildArguments: '/p:StyleCopTreatErrorsAsWarnings="True" /p:NuGetExePath="C:\\agent\\externals\\nuget\\nuget.exe"'
+    msbuildArguments: '/p:StyleCopTreatErrorsAsWarnings="True"'
     restoreNugetPackages: true
 - task: DotNetCoreCLI@2
   inputs:
@@ -78,19 +79,24 @@ steps:
   inputs:
     command: 'build'
     projects: 'Source/OxyPlot.core.sln'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: 'Source/OxyPlot.core.sln'
 - task: NuGetPackager@0
   displayName: 'NuGet Packager '
   inputs:
     searchPattern: evoleap.OxyPlot.Wpf.nuspec
-- task: DotNetCoreCLI@2
+- task: NuGetCommand@2
   inputs:
     command: 'pack'
     packagesToPack: 'evoleap.OxyPlot.Wpf.core.nuspec'
-    packDirectory: '$(Build.SourcesDirectory)'
+    packDestination: '$(Build.SourcesDirectory)'
     versioningScheme: 'off'
 - task: NuGetCommand@2
   displayName: 'NuGet push'
+  condition: and(succeeded(), not(eq(variables['prBuild'], 'True')))
   inputs:
     command: push
-    packagesToPush: '$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf.*.nupkg;!$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf.*.symbols.nupkg'
+    packagesToPush: '$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf*.nupkg;!$(Build.SourcesDirectory)/evoleap.OxyPlot.Wpf*.symbols.nupkg'
     publishVstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'

@@ -10,6 +10,7 @@
 namespace OxyPlot.Tests
 {
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     /// <summary>
     /// Provides unit tests for the <see cref="CohenSutherlandClipping" /> class.
@@ -29,7 +30,7 @@ namespace OxyPlot.Tests
             public void InsidePoint()
             {
                 var clipping = new CohenSutherlandClipping(new OxyRect(0, 0, 1, 1));
-                Assert.IsTrue(clipping.IsInside(new ScreenPoint(0.5, 0.5)));
+                ClassicAssert.IsTrue(clipping.IsInside(new ScreenPoint(0.5, 0.5)));
             }
 
             /// <summary>
@@ -39,7 +40,7 @@ namespace OxyPlot.Tests
             public void OutsidePoint()
             {
                 var clipping = new CohenSutherlandClipping(new OxyRect(0, 0, 1, 1));
-                Assert.IsFalse(clipping.IsInside(new ScreenPoint(-0.5, 0.5)));
+                ClassicAssert.IsFalse(clipping.IsInside(new ScreenPoint(-0.5, 0.5)));
             }
         }
 
@@ -58,9 +59,9 @@ namespace OxyPlot.Tests
                 var clipping = new CohenSutherlandClipping(new OxyRect(0, 0, 1, 1));
                 var p0 = new ScreenPoint(0.3, -0.2);
                 var p1 = new ScreenPoint(0.6, 1.3);
-                Assert.IsTrue(clipping.ClipLine(ref p0, ref p1));
-                Assert.AreEqual(0, p0.Y);
-                Assert.AreEqual(1, p1.Y);
+                ClassicAssert.IsTrue(clipping.ClipLine(ref p0, ref p1));
+                ClassicAssert.AreEqual(0, p0.Y);
+                ClassicAssert.AreEqual(1, p1.Y);
             }
 
             /// <summary>
@@ -73,9 +74,9 @@ namespace OxyPlot.Tests
                 var clipping = new CohenSutherlandClipping(new OxyRect(0.3, -0.5, 0.5, 1));
                 var p0 = new ScreenPoint(0, 0);
                 var p1 = new ScreenPoint(1, 0);
-                Assert.IsTrue(clipping.ClipLine(ref p0, ref p1));
-                Assert.AreEqual(new ScreenPoint(0.3, 0), p0);
-                Assert.AreEqual(new ScreenPoint(0.8, 0), p1);
+                ClassicAssert.IsTrue(clipping.ClipLine(ref p0, ref p1));
+                ClassicAssert.AreEqual(new ScreenPoint(0.3, 0), p0);
+                ClassicAssert.AreEqual(new ScreenPoint(0.8, 0), p1);
             }
 
             /// <summary>
@@ -87,9 +88,9 @@ namespace OxyPlot.Tests
                 var clipping = new CohenSutherlandClipping(new OxyRect(0, 0, 1, 1));
                 var p0 = new ScreenPoint(0.3, 0.2);
                 var p1 = new ScreenPoint(0.6, 0.8);
-                Assert.IsTrue(clipping.ClipLine(ref p0, ref p1));
-                Assert.AreEqual(0.2, p0.Y);
-                Assert.AreEqual(0.8, p1.Y);
+                ClassicAssert.IsTrue(clipping.ClipLine(ref p0, ref p1));
+                ClassicAssert.AreEqual(0.2, p0.Y);
+                ClassicAssert.AreEqual(0.8, p1.Y);
             }
 
             /// <summary>
@@ -101,9 +102,9 @@ namespace OxyPlot.Tests
                 var clipping = new CohenSutherlandClipping(new OxyRect(0, 0, 1, 1));
                 var p0 = new ScreenPoint(0.3, -0.2);
                 var p1 = new ScreenPoint(0.6, -0.2);
-                Assert.IsFalse(clipping.ClipLine(ref p0, ref p1));
-                Assert.AreEqual(-0.2, p0.Y);
-                Assert.AreEqual(-0.2, p1.Y);
+                ClassicAssert.IsFalse(clipping.ClipLine(ref p0, ref p1));
+                ClassicAssert.AreEqual(-0.2, p0.Y);
+                ClassicAssert.AreEqual(-0.2, p1.Y);
             }
         }
     }

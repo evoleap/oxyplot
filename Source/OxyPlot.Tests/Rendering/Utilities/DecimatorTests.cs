@@ -11,8 +11,8 @@ namespace OxyPlot.Tests.Rendering.Utilities
 {
     using System;
     using System.Collections.Generic;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     /// <summary>
     /// Provides unit tests for the <see cref="Decimator" /> class.
@@ -36,7 +36,7 @@ namespace OxyPlot.Tests.Rendering.Utilities
             }
 
             Decimator.Decimate(input, output);
-            Assert.AreEqual(6, output.Count);
+            ClassicAssert.AreEqual(6, output.Count);
         }
     }
 }

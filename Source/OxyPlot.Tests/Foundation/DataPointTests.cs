@@ -10,6 +10,7 @@
 namespace OxyPlot.Tests
 {
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     /// <summary>
     /// Provides unit tests for the <see cref="DataPoint" /> type.
@@ -28,9 +29,9 @@ namespace OxyPlot.Tests
             [Test]
             public void ValidPoints()
             {
-                Assert.IsTrue(new DataPoint(1, 2).IsDefined());
-                Assert.IsTrue(new DataPoint(double.MaxValue, double.MaxValue).IsDefined());
-                Assert.IsTrue(new DataPoint(double.MinValue, double.MinValue).IsDefined());
+                ClassicAssert.IsTrue(new DataPoint(1, 2).IsDefined());
+                ClassicAssert.IsTrue(new DataPoint(double.MaxValue, double.MaxValue).IsDefined());
+                ClassicAssert.IsTrue(new DataPoint(double.MinValue, double.MinValue).IsDefined());
             }
 
             /// <summary>
@@ -39,11 +40,11 @@ namespace OxyPlot.Tests
             [Test]
             public void InvalidPoints()
             {
-                Assert.IsFalse(new DataPoint(double.NaN, double.NaN).IsDefined());
-                Assert.IsFalse(new DataPoint(double.NaN, 2).IsDefined());
-                Assert.IsFalse(new DataPoint(2, double.NaN).IsDefined());
+                ClassicAssert.IsFalse(new DataPoint(double.NaN, double.NaN).IsDefined());
+                ClassicAssert.IsFalse(new DataPoint(double.NaN, 2).IsDefined());
+                ClassicAssert.IsFalse(new DataPoint(2, double.NaN).IsDefined());
                 var p = DataPoint.Undefined;
-                Assert.IsFalse(p.IsDefined());
+                ClassicAssert.IsFalse(p.IsDefined());
             }
         }
     }

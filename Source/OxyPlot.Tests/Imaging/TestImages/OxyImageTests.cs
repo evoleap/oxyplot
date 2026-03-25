@@ -10,8 +10,8 @@ namespace OxyPlot.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
-
     using NUnit.Framework;
+    using NUnit.Framework.Legacy;
 
     // ReSharper disable InconsistentNaming
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
@@ -28,11 +28,11 @@ namespace OxyPlot.Tests
         public void GetFormat_TestFiles_(string fileName, ImageFormat expectedImageFormat)
         {
             var image = new OxyImage(File.ReadAllBytes(@"Imaging\TestImages\" + fileName));
-            Assert.AreEqual(expectedImageFormat, image.Format);
-            Assert.AreEqual(137, image.Width);
-            Assert.AreEqual(59, image.Height);
-            Assert.AreEqual(72, Math.Round(image.DpiX));
-            Assert.AreEqual(72, Math.Round(image.DpiY));
+            ClassicAssert.AreEqual(expectedImageFormat, image.Format);
+            ClassicAssert.AreEqual(137, image.Width);
+            ClassicAssert.AreEqual(59, image.Height);
+            ClassicAssert.AreEqual(72, Math.Round(image.DpiX));
+            ClassicAssert.AreEqual(72, Math.Round(image.DpiY));
         }
 
         [Test]

@@ -5,6 +5,3 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System.Reflection;
-
-[assembly: AssemblyTitle("OxyPlot.OpenXml")]
-[assembly: AssemblyDescription("OxyPlot OpenXml export library")]

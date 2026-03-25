@@ -1,0 +1,85 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>WpfExamples</RootNamespace>
+    <AssemblyName>WpfExamples</AssemblyName>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>..\..\..\..\Icons\OxyPlot.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ScatterErrorSeriesDemo.png" />
+    <Resource Include="Images\ResizeDemo.png" />
+    <Resource Include="Images\HeatMapDemo.png" />
+    <Resource Include="Images\ContextMenuDemo.png" />
+    <Resource Include="Images\OverlayDemo.png" />
+    <Resource Include="Images\ColorBindingDemo.png" />
+    <Resource Include="Images\ColumnSeriesDemo.png" />
+    <Resource Include="Images\TaskDemo.png" />
+    <Resource Include="Images\AxesDemo.png" />
+    <Resource Include="Images\CoupledAxesDemo.png" />
+    <Resource Include="Images\UserControlDemo.png" />
+    <Resource Include="Images\AreaDemo.png" />
+    <Resource Include="Images\BarSeriesDemo.png" />
+    <Resource Include="Images\BindingDemo.png" />
+    <Resource Include="Images\ContourDemo.png" />
+    <Resource Include="Images\CsvDemo.png" />
+    <Resource Include="Images\CustomTrackerDemo.png" />
+    <Resource Include="Images\DateTimeDemo.png" />
+    <Resource Include="Images\HistogramDemo.png" />
+    <Resource Include="Images\LegendsDemo.png" />
+    <Resource Include="Images\PieDemo.png" />
+    <Resource Include="Images\PolarDemo.png" />
+    <Resource Include="Images\RealtimeDemo.png" />
+    <Resource Include="Images\RefreshDemo.png" />
+    <Resource Include="Images\ScatterDemo.png" />
+    <Resource Include="Examples\HistogramDemo\hare.jpg" />
+    <Resource Include="..\..\..\..\Icons\OxyPlot_64.png">
+      <Link>OxyPlot_64.png</Link>
+    </Resource>
+    <Content Include="Examples\CsvDemo\Data\GlobalTemperatureAnomaly.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\CsvDemo\Data\RiverFlow.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\CsvDemo\Data\WorldPopulation.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\AnnotationDemo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\OxyPlot.OpenXml\OxyPlot.OpenXml.core.csproj" />
+    <ProjectReference Include="..\..\..\OxyPlot.Pdf\OxyPlot.Pdf.core.csproj" />
+    <ProjectReference Include="..\..\..\OxyPlot.Wpf\OxyPlot.Wpf.core.csproj" />
+    <ProjectReference Include="..\..\..\OxyPlot.Xps\OxyPlot.Xps.core.csproj" />
+    <ProjectReference Include="..\..\..\OxyPlot\OxyPlot.core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Workitems\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="PropertyTools.Wpf" Version="3.1.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+  </ItemGroup>
+</Project>

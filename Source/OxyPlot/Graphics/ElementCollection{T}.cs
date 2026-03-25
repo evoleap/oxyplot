@@ -106,6 +106,12 @@ namespace OxyPlot
         /// <exception cref="System.InvalidOperationException">The element cannot be added, it already belongs to a PlotModel.</exception>
         public void Add(T item)
         {
+            if (item.Parent != null)
+            {
+                // Copied this from the OxyPlot base repo. This will allow unit tests to pass.
+                throw new InvalidOperationException("The element cannot be added, it already belongs to a PlotModel.");
+            }
+
             if (item.Parent == null && !IsCustomLegendSeries)
             {
                 item.Parent = this.parent;

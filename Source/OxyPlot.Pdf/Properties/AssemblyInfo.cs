@@ -5,6 +5,3 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System.Reflection;
-
-[assembly: AssemblyTitle("OxyPlot.Pdf")]
-[assembly: AssemblyDescription("OxyPlot PDF export library")]
