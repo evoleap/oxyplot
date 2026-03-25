@@ -56,14 +56,20 @@ steps:
   inputs:
     filename: buildhelper.exe
     arguments: 'nuspecVersion -s WorkingVersion.txt -d evoleap.OxyPlot.Wpf.core.nuspec'
+- task: DotNetCoreCLI@2
+  displayName: 'Restore NuGet packages for OxyPlot.WPF.sln'
+  inputs:
+    command: 'restore'
+    projects: 'Source/OxyPlot.WPF.sln'
+    feedsToUse: 'select'
 - task: MSBuild@1
   displayName: 'Build solution Source/OxyPlot.WPF.sln'
   inputs:
     solution: Source/OxyPlot.WPF.sln
     platform: '$(BuildPlatform)'
     configuration: '$(BuildConfiguration)'
-    msbuildArguments: '/p:StyleCopTreatErrorsAsWarnings="True" /p:NuGetExePath="C:\\agent\\externals\\nuget\\nuget.exe"'
-    restoreNugetPackages: true
+    msbuildArguments: '/p:StyleCopTreatErrorsAsWarnings="True"'
+    restoreNugetPackages: false
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
