@@ -7,6 +7,7 @@
     <ProductVersion>10.0.0</ProductVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup>
     <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
