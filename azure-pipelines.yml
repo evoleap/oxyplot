@@ -49,7 +49,7 @@ steps:
     repo: devops
     file: oxyplot/evoleap.OxyPlot.Wpf.nuspec
     version: $(workingVersion)
-    replacements: '"<version>[\d.]+</version>","<version>$(workingVersion)</version>"'
+    replacements: '"<version>[\d.]+</version>","<version>$(symVer)</version>"'
 
 # Restore and build .NET 4.8 solution (OxyPlot.WPF.sln)
 - task: DotNetCoreCLI@2
@@ -122,3 +122,4 @@ steps:
     command: push
     packagesToPush: '$(Build.SourcesDirectory)/evoleap.OxyPlot*.nupkg;!$(Build.SourcesDirectory)/evoleap.OxyPlot*.symbols.nupkg'
     publishVstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'
+    allowPackageConflicts: true
