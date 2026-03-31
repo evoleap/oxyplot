@@ -9,6 +9,11 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <PackageId>evoleap.OxyPlot.Wpf.core</PackageId>
+    <Authors>evoleap</Authors>
+    <Description>Modified version of OxyPlot. OxyPlot is an open source plotting library for .NET 8. This package contains the custom control for WPF applications.</Description>
+    <PackageTags>wpf plotting plot charting chart</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
   <PropertyGroup>
     <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
