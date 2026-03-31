@@ -35,6 +35,15 @@ steps:
     verPrefixVar: 'verPrefix'
     verSuffixVar: 'verSuffix'
 
+# Set package version: workingVersion for normal builds, symVer for PR builds
+- bash: |
+    if [ "$(prBuild)" = "True" ]; then
+      echo "##vso[task.setvariable variable=packageVersion]$(symVer)"
+    else
+      echo "##vso[task.setvariable variable=packageVersion]$(workingVersion)"
+    fi
+  displayName: 'Set package version'
+
 # Update version in GlobalAssemblyInfo.cs
 - template: templates/replace-version-text.yml@evoleapdevops
   parameters:
@@ -48,8 +57,8 @@ steps:
   parameters:
     repo: devops
     file: oxyplot/evoleap.OxyPlot.Wpf.nuspec
-    version: $(workingVersion)
-    replacements: '"<version>[\d.]+</version>","<version>$(symVer)</version>"'
+    version: $(packageVersion)
+    replacements: '"<version>[^<]+</version>","<version>$(packageVersion)</version>"'
 
 # Restore and build .NET 4.8 solution (OxyPlot.WPF.sln)
 - task: DotNetCoreCLI@2
@@ -93,7 +102,7 @@ steps:
   inputs:
     command: 'pack'
     packagesToPack: 'oxyplot/evoleap.OxyPlot.Wpf.nuspec'
-    packDestination: '$(Build.SourcesDirectory)'
+    packDestination: '$(Build.ArtifactStagingDirectory)'
     versioningScheme: 'off'
 - task: DotNetCoreCLI@2
   displayName: 'Pack evoleap.OxyPlot.core'
@@ -101,25 +110,25 @@ steps:
     command: 'pack'
     packagesToPack: 'oxyplot/Source/OxyPlot/OxyPlot.core.csproj'
     configuration: '$(BuildConfiguration)'
-    packDirectory: '$(Build.SourcesDirectory)'
+    packDirectory: '$(Build.ArtifactStagingDirectory)'
     nobuild: true
     versioningScheme: 'byEnvVar'
-    versionEnvVar: 'symVer'
+    versionEnvVar: 'packageVersion'
 - task: DotNetCoreCLI@2
   displayName: 'Pack evoleap.OxyPlot.Wpf.core'
   inputs:
     command: 'pack'
     packagesToPack: 'oxyplot/Source/OxyPlot.Wpf/OxyPlot.Wpf.core.csproj'
     configuration: '$(BuildConfiguration)'
-    packDirectory: '$(Build.SourcesDirectory)'
+    packDirectory: '$(Build.ArtifactStagingDirectory)'
     nobuild: true
     versioningScheme: 'byEnvVar'
-    versionEnvVar: 'symVer'
+    versionEnvVar: 'packageVersion'
 - task: NuGetCommand@2
   displayName: 'NuGet push'
   condition: and(succeeded(), not(eq(variables['prBuild'], 'True')))
   inputs:
     command: push
-    packagesToPush: '$(Build.SourcesDirectory)/evoleap.OxyPlot*.nupkg;!$(Build.SourcesDirectory)/evoleap.OxyPlot*.symbols.nupkg'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/evoleap.OxyPlot*.nupkg;!$(Build.ArtifactStagingDirectory)/evoleap.OxyPlot*.symbols.nupkg'
     publishVstsFeed: '4e2dc0fe-c532-420e-8889-18ca9bea1ff1'
     allowPackageConflicts: true
